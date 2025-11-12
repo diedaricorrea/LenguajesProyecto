@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - UTPedidos</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/pedidos.css}">
+    <link rel="stylesheet" th:href="@{/css/modal.css}">
+    <link rel="stylesheet" th:href="@{/css/error.css}">
+</head>
+
+<body>
+    <!-- navbar -->
+    <div th:replace="~{fragments/navbarUsuario :: navbarU}"></div>
+
+    <!-- Contenido principal -->
+    <main class="">
+    <div class="container ">
+        <div class="row">
+            <div class="mt-6 col-md-12">
+                <div class="tabla-contenedor">
+                    <div class="table-responsive">
+                        <span class="text-warning" th:if="${carrito.isEmpty()}">No tienes productos en tu carrito agrega uno</span>
+                        <p>No olvidar una vez cancelado no hay reembolso</p>
+                        <table class="align-middle text-center w-100">
+                            <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio unitario</th>
+                                <th>Subtotal</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr th:each="item : ${carrito}">
+                                <td><img th:src="@{${item.getIdProducto().imagenUrl}}" style="width: 60px;" alt="">
+                                </td>
+                                <td th:text="${item.getIdProducto().nombre}"></td>
+                                <td th:text="${item.cantidad}"></td>
+                                <td th:text="${item.getIdProducto().precio}"></td>
+                                <td class="subtotal" th:text="${item.total}"></td>
+                                <td>
+                                    <form th:action="@{/carrito/eliminar}" method="POST">
+                                        <input type="hidden" name="idUsuario" th:value="${item.getIdUsuario().idUsuario}">
+                                        <input type="hidden" name="idProducto" th:value="${item.getIdProducto().idProducto}">
+                                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            </tbody>
+
+                            <tfoot>
+                            <tr>
+                                <td colspan="5"><strong>Total:</strong></td>
+                                <td><strong id="totalCarrito">S/ 0.00</strong></td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <div class="botones d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                            <a class="btn1 btn w-100 w-md-auto" th:href="@{/catalogo}">Añadir producto</a>
+                            <button type="button" class="btn btn-success btn-lg"
+                                    onclick="abrirModal()">Pagar</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="modalDetalle" class="modal-custom">
+            <div class="modal-content-custom">
+                <span class="close" onclick="cerrarModal()">&times;</span>
+                <h5>Confirmar Pago</h5>
+                <form th:action="@{/pedidos/pedir}" method="post" id="formPago" > <!--onsubmit="return false;"-->
+                    <div th:if="${error}" class="alert alert-danger text-center">
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="metodo" class="form-label">Método de Pago</label>
+                        <select class="form-select" name="metodo" id="metodo" required>
+                            <option value="Yape">Yape</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="telefono" class="form-label">Número de Teléfono</label>
+                        <input type="tel" class="form-control" name="telefono" id="telefono" pattern="[0-9]{9}"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="codigo" class="form-label">Código de Verificación</label>
+                        <input type="text" class="form-control" name="codigo" id="codigo" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="horaRecojo" class="form-label">Hora de recojo</label>
+                        <input type="time" class="form-control" name="horaEntrega" id="horaRecojo" required />
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-success" onclick="confirmarPago()">Confirmar
+                            pago</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+            crossorigin="anonymous"></script>
+    
+    <!-- Scripts personalizados -->
+    <script th:src="@{/js/modal.js}"></script>
+    <script th:src="@{/js/notificacion.js}"></script>
+    <script th:src="@{/js/suma.js}"></script>
+    <script th:src="@{/js/filtro.js}"></script>
+</body>
+
+</html>

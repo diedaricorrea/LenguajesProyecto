@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - UTPedidos</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/pedidos.css}">
+    <link rel="stylesheet" th:href="@{/css/modal.css}">
+    <link rel="stylesheet" th:href="@{/css/error.css}">
+</head>
+
+<body>
+    <!-- navbar -->
+    <div th:replace="~{fragments/navbarUsuario :: navbarU}"></div>
+
+    <!-- Contenido principal -->
+    <main>
+        <div th:if="${message}" id="mensaje-alerta" class="alert alert-success alert-dismissible fade show"
+             role="alert">
+            <span th:text="${message}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <!-- Sección de filtros de categoría -->
+        <section class="text-center my-4">
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <!-- Botón principal para mostrar/ocultar subcategorías -->
+                <a href="#" id="btn-menu-dia" class="btn-filtro rounded-pill">
+                    MENÚ DEL DÍA
+                </a>
+
+                <!-- Otras categorías -->
+                <a class="btn-filtro rounded-pill filtro-general" th:href="@{/catalogo(categoria='Bebidas')}"
+                   th:classappend="${param.categoria} == 'Bebidas' ? ' activo' : ''">
+                    BEBIDAS
+                </a>
+                <a class="btn-filtro rounded-pill filtro-general" th:href="@{/catalogo(categoria='Snack')}"
+                   th:classappend="${param.categoria} == 'Snack' ? ' activo' : ''">
+                    SNACKS
+                </a>
+                <a class="btn-filtro rounded-pill filtro-general" th:href="@{/catalogo(categoria='Postres')}"
+                   th:classappend="${param.categoria} == 'Postres' ? ' activo' : ''">
+                    POSTRES
+                </a>
+            </div>
+
+            <!-- Subcategorías del menú del día -->
+            <div id="botones-menu-dia" class="d-none d-flex justify-content-center gap-3 mt-3 flex-wrap">
+                <a class="btn-filtro btn-menu-extra rounded-pill" th:href="@{/catalogo(categoria='MENU ECONOMICO')}"
+                   th:classappend="${param.categoria} == 'MENU ECONOMICO' ? ' activo' : ''">
+                    Económico
+                </a>
+                <a class="btn-filtro btn-menu-extra rounded-pill" th:href="@{/catalogo(categoria='MENU EJECUTIVO')}"
+                   th:classappend="${param.categoria} == 'MENU EJECUTIVO' ? ' activo' : ''">
+                    Ejecutivo
+                </a>
+                <a class="btn-filtro btn-menu-extra rounded-pill" th:href="@{/catalogo(categoria='MENU UNIVERSITARIO')}"
+                   th:classappend="${param.categoria} == 'MENU UNIVERSITARIO' ? ' activo' : ''">
+                    Universitario
+                </a>
+            </div>
+
+        </section>
+
+
+
+        <!-- Barra de búsqueda -->
+        <section class="container mb-4">
+            <form method="get" th:action="@{/catalogo}" class="d-flex justify-content-center search-form">
+                <input class="form-control me-2 search-input" type="search" name="busqueda"
+                       placeholder="¿Algo que se te antoje?" th:value="${busquedaActual}">
+                <input type="hidden" name="categoria" th:value="${categoriaActual}" />
+                <button class="btn btn-outline-primary search-btn" type="submit">Buscar</button>
+            </form>
+            <!-- Mensaje si no se encuentra el producto -->
+            <div class="text-center mt-5" th:if="${noResultados}">
+                <div class="custom-alert d-inline-block px-4 py-3 shadow-sm rounded-4">
+                    <i class="bi bi-exclamation-circle me-2 fs-5"></i>
+                    Lo sentimos, no encontramos resultados para "<span th:text="${busquedaActual}"></span>".
+                    <br>
+                    <a th:href="@{/catalogo/}" class="btn custom-btn mt-3">Volver al menú general</a>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Cards de productos -->
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-4 mb-4" th:each="producto : ${productos}">
+                    <div class="card h-100 shadow-sm">
+                        <img th:src="@{${producto.imagenUrl}}" class="card-img-top" alt="Imagen del producto"
+                             style="height: 200px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column text-center">
+                            <h5 class="card-title" th:text="${producto.nombre}"></h5>
+                            <p class="card-text text-muted">S/. <span th:text="${producto.precio}"></span></p>
+                            <p class="card-text text-muted"> <span th:text="${producto.descripcion}"></span> </p>
+                            <button class="btn btn-success mt-auto"
+                                    th:attr="data-nombre=${producto.nombre}, data-description=${producto.descripcion} ,data-precio=${producto.precio},data-id=${producto.idProducto}"
+                                    onclick="abrirModal(this)">
+                                Ver detalle
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paginación -->
+        <nav th:if="${totalPages > 1}">
+            <ul class="pagination justify-content-center">
+                <!-- Botón anterior -->
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{'/catalogo'(categoria=${categoriaActual}, busqueda=${busquedaActual}, page=${currentPage - 1})}">Anterior</a>
+                </li>
+                <!-- Números de página -->
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${i == currentPage} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{'/catalogo'(categoria=${categoriaActual}, busqueda=${busquedaActual}, page=${i})}"
+                       th:text="${i + 1}">1</a>
+                </li>
+                <!-- Botón siguiente -->
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{'/catalogo'(categoria=${categoriaActual}, busqueda=${busquedaActual}, page=${currentPage + 1})}">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+
+
+
+        <!-- Modal -->
+        <div id="modalDetalle" class="modal">
+            <div class="modal-contenido">
+                <span class="cerrar" onclick="cerrarModal()">&times;</span>
+                <h2 id="modalNombre"></h2>
+                <p id="modalPrecio"></p>
+                <p id="modalDescription"></p>
+                <form method="post" th:action="@{/catalogo/subir}">
+                    <input type="hidden" id="idProducto" name="idProducto">
+                    <input type="hidden" name="idUsuario" value="1" id="idUsuario">
+                    <input type="hidden" name="nombreProducto" id="nombreProducto">
+                    <label>Cantidad:</label>
+                    <input type="number" name="cantidad" min="1" max="10" value="1" required>
+                    <button type="submit">Agregar al carrito</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+            crossorigin="anonymous"></script>
+    
+    <!-- Scripts personalizados -->
+    <script th:src="@{/js/modal.js}"></script>
+    <script th:src="@{/js/notificacion.js}"></script>
+    <script th:src="@{/js/suma.js}"></script>
+    <script th:src="@{/js/filtro.js}"></script>
+    <script th:if="${message}">
+        document.addEventListener("DOMContentLoaded", function () {
+            const alerta = document.getElementById('mensaje-alerta');
+            setTimeout(() => {
+                // Usa Bootstrap para cerrar con animación
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(alerta);
+                bsAlert.close();
+            }, 1500); // 1 segundos
+        });
+    </script>
+</body>
+
+</html>

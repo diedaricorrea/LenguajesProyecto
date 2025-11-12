@@ -1,0 +1,97 @@
+/* Estilos adicionales para la gestión de categorías */
+
+.categoria-item {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+.categoria-item:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.categoria-nombre {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.categoria-count {
+    background-color: #17a2b8;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.btn-categoria-edit {
+    background-color: #ffc107;
+    color: #000;
+    border: none;
+    padding: 0.375rem 0.75rem;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-categoria-edit:hover {
+    background-color: #e0a800;
+}
+
+.btn-categoria-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.375rem 0.75rem;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-categoria-delete:hover {
+    background-color: #c82333;
+}
+
+.btn-categoria-delete:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Animación para mensajes */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert {
+    animation: slideDown 0.3s ease-out;
+}
+
+/* Mejora para el input de nueva categoría en producto form */
+#divNuevaCategoria {
+    animation: slideDown 0.3s ease-out;
+}
+
+#divNuevaCategoria .input-group {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .btn-action {
+        margin-bottom: 0.25rem;
+    }
+    
+    .categoria-card {
+        margin-bottom: 1.5rem;
+    }
+}

@@ -1,0 +1,9 @@
+[
+    {
+        "id_venta": 231321,
+        "id_detalle_venta": 123456,
+        "id_user": "U22230019",
+        "fecha": "12-12-2025 14:30:2",
+        "estado": "ENTREGADO"
+    }
+]

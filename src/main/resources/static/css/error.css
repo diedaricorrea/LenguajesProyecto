@@ -1,0 +1,14 @@
+.error-container {
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.error-container h1 {
+    font-size: 3rem;
+    color: #c0392b;
+}
+
+.error-container p {
+    font-size: 1.3rem;
+    color: #555;
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <title>Transition</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f0f2f5; /* Un fondo gris claro para la página */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 1rem; /* Añadir padding para pantallas pequeñas */
+    }
+    .card {
+        border-radius: 0.75rem; /* Bordes redondeados */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+    }
+    .btn {
+        border-radius: 0.5rem; /* Bordes redondeados para botones */
+        padding: 0.75rem 1.5rem; /* Padding para botones */
+        font-weight: 600; /* Semibold */
+        transition: all 0.3s ease-in-out; /* Transición suave */
+    }
+    .btn:hover {
+        transform: scale(1.05); /* Efecto de escala al pasar el ratón */
+    }
+    </style>
+
+</head>
+<body>
+    <main>
+        <div class="card p-4 p-md-5 text-center" style="max-width: 400px; width: 100%;">
+            <h1 class="h3 mb-4 text-dark">Bienvenido</h1>
+            <p class="text-muted mb-4">Por favor, selecciona tu tipo de acceso:</p>
+
+            <div class="d-grid gap-3">
+                <!-- Botón para el panel de administrador -->
+                <a th:href="@{/productos}" class="btn btn-primary">
+                    Acceder al Panel de Administrador
+                </a>
+
+                <!-- Botón para la vista de usuario normal -->
+                <a th:href="@{/catalogo}" class="btn btn-success">
+                    Ver Contenido como Usuario
+                </a>
+
+                <!-- Botón para la vista de usuario normal -->
+                <a th:href="@{/logout}" class="btn">
+                    Salir
+                </a>
+
+            </div>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

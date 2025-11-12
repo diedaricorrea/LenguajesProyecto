@@ -1,0 +1,29 @@
+<div th:fragment="estadisticasProductoFragment">
+    <div class="card mt-4">
+        <div class="card-header">
+            <h4>Estadísticas de Productos Más Vendidos</h4>
+        </div>
+        <div class="card-body">
+            <div th:if="${#lists.isEmpty(productosMasVendidos)}" class="text-center text-muted">
+                <i class="fas fa-chart-bar fa-2x"></i>
+                <p>No hay datos de ventas para mostrar.</p>
+            </div>
+            <div th:if="${!#lists.isEmpty(productosMasVendidos)}">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad Vendida</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${productosMasVendidos}">
+                        <td th:text="${row.nombre}">Nombre producto</td>
+                        <td th:text="${row.totalVendidos}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

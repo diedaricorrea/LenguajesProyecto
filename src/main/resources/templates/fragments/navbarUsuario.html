@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <title>navbar</title>
+</head>
+
+<body>
+<header th:fragment="navbarU">
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <div class="container-fluid">
+            <!-- LOGO -->
+            <a class="navbar-brand d-flex align-items-center me-4" href="#">
+                <span class="logo-coffee">Coffee</span>
+                <span class="logo-utpedidos">UTPedidos</span>
+            </a>
+            <!-- Botón responsive -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Contenido navbar -->
+            <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+                <!-- Enlaces a la izquierda -->
+                <ul class="navbar-nav gap-4">
+                    <li class="nav-item d-flex align-items-center">
+                        <i class="bi bi-grid-fill"></i>
+                        <a class="nav-link nav-link-custom" th:href="@{/catalogo}">MENÚ</a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <i class="bi bi-cart-fill"></i>
+                        <a class="nav-link nav-link-custom" th:href="@{/carrito}">CARRITO</a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <i class="bi bi-receipt-cutoff"></i>
+                        <a class="nav-link nav-link-custom" th:href="@{/pedidos}">PEDIDOS</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center ms-auto">
+                    <!-- Icono de campana -->
+                    <div class="notification-bell" onclick="toggleNotifications()" style="cursor: pointer;">
+                        <i class="bi bi-bell-fill"></i>
+                    </div>
+                    <!-- Ícono de usuario a la derecha -->
+                    <div class="dropdown ms-auto">
+                        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
+                           id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-fill"></i> <!-- Ícono -->
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end text-small shadow"
+                            aria-labelledby="userDropdown">
+                            <li>
+                                <h6>Hola: <span th:text="${usuarioNombre}"></span></h6>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li th:if="${usuarioAdmins != 'USUARIO'}"><a class="dropdown-item text-danger" th:href="@{/login/medio}">Salir</a></li>
+                            <li><a class="dropdown-item text-danger" th:href="@{/logout}">Cerrar sesión</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Modal lateral derecho de notificaciones -->
+    <div id="notification-modal" class="notification-modal hidden" onclick="closeNotifications(event)">
+        <div class="notification-content" onclick="event.stopPropagation()">
+            <div class="notification-header">
+                <h5 class="mb-0">Notificaciones</h5>
+                <span onclick="closeNotifications(event)" style="cursor: pointer;">&times;</span>
+            </div>
+            <div class="notification-body" th:each="notificacion : ${notificaciones}">
+                <div class="d-flex align-items-start p-3 mb-2 rounded shadow-sm"
+                     th:classappend="${notificacion.estado} ? 'bg-light' : 'bg-warning-subtle border-start border-5 border-warning'">
+                    <i class="bi bi-bell-fill me-3 fs-4 text-warning"></i>
+                    <div>
+                        <p class="mb-1 fw-semibold" th:text="${notificacion.mensaje}">Mensaje</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</header>
+</body>
+
+</html>

@@ -1,0 +1,195 @@
+<!-- fragments/productoForm.html -->
+<div th:fragment="productoFormFragment">
+    <form th:action="@{/productos/subirproductos}" method="post" enctype="multipart/form-data" id="productoForm">
+        <input type="hidden" name="id" th:value="${producto.idProducto}">
+        
+        <!-- Nombre del Producto -->
+        <div class="mb-3">
+            <label for="nombre" class="form-label fw-bold">
+                <i class="bi bi-tag-fill text-primary"></i> Nombre del Producto
+            </label>
+            <input type="text" class="form-control form-control-lg" id="nombre" name="nombre" 
+                   placeholder="Ej: Hamburguesa Especial, Pizza Margherita..." 
+                   required th:value="${producto.nombre}"
+                   minlength="2" maxlength="100">
+            <div class="form-text">Nombre descriptivo que aparecerá en la carta</div>
+        </div>
+
+        <!-- Categoría Mejorada -->
+        <div class="mb-3">
+            <label for="categoriaSearch" class="form-label fw-bold">
+                <i class="bi bi-collection-fill text-info"></i> Categoría
+            </label>
+            
+            <!-- Búsqueda de categoría con autocompletar -->
+            <div class="categoria-selector-wrapper">
+                <div class="input-group">
+                    <span class="input-group-text bg-light">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control" id="categoriaSearch" 
+                           placeholder="Buscar o crear categoría..." 
+                           autocomplete="off">
+                    <button class="btn btn-outline-success" type="button" id="btnCrearCategoriaRapida" 
+                            title="Crear nueva categoría">
+                        <i class="bi bi-plus-lg"></i> Nueva
+                    </button>
+                </div>
+                
+                <!-- Select oculto que mantiene el valor real -->
+                <select class="d-none" id="categoria" name="categoria">
+                    <option value="">Seleccionar categoría</option>
+                    <option th:each="cat : ${categorias}" 
+                            th:value="${cat.nombre}" 
+                            th:text="${cat.nombre}" 
+                            th:selected="${producto.nombreCategoria != null && producto.nombreCategoria == cat.nombre}">
+                    </option>
+                </select>
+                
+                <!-- Lista de sugerencias -->
+                <div id="categoriasSugerencias" class="categoria-sugerencias" style="display: none;"></div>
+                
+                <!-- Categoría seleccionada -->
+                <div id="categoriaSeleccionada" class="categoria-seleccionada mt-2" style="display: none;">
+                    <span class="badge bg-info fs-6 p-2">
+                        <i class="bi bi-bookmark-fill"></i>
+                        <span id="categoriaTexto"></span>
+                        <button type="button" class="btn-close btn-close-white ms-2" 
+                                id="btnLimpiarCategoria" aria-label="Quitar"></button>
+                    </span>
+                </div>
+            </div>
+            <div class="form-text">
+                <i class="bi bi-info-circle"></i> Escribe para buscar o crear una nueva categoría
+            </div>
+        </div>
+
+        <!-- Modal para crear categoría nueva -->
+        <div id="modalNuevaCategoria" class="categoria-modal" style="display: none;">
+            <div class="categoria-modal-content">
+                <div class="categoria-modal-header">
+                    <h5><i class="bi bi-folder-plus"></i> Crear Nueva Categoría</h5>
+                    <button type="button" class="btn-close" id="btnCerrarModalCategoria"></button>
+                </div>
+                <div class="categoria-modal-body">
+                    <div class="mb-3">
+                        <label for="nuevaCategoriaNombre" class="form-label">Nombre de la categoría</label>
+                        <input type="text" class="form-control" id="nuevaCategoriaNombre" 
+                               placeholder="Ej: Entradas, Platos Principales, Postres..." 
+                               maxlength="100">
+                        <div class="form-text">La categoría se creará y seleccionará automáticamente</div>
+                    </div>
+                </div>
+                <div class="categoria-modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnCancelarModalCategoria">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="btnConfirmarNuevaCategoria">
+                        <i class="bi bi-check-circle"></i> Crear Categoría
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Precio -->
+        <div class="mb-3">
+            <label for="precio" class="form-label fw-bold">
+                <i class="bi bi-currency-dollar text-success"></i> Precio
+            </label>
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-success text-white">S/</span>
+                <input type="number" class="form-control" id="precio" name="precio" 
+                       placeholder="0.00" step="0.01" min="0.01" required th:value="${producto.precio}">
+            </div>
+            <div class="form-text">
+                <small>Precio final incluido IGV (18%)</small>
+            </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="mb-3">
+            <label for="descripcion" class="form-label fw-bold">
+                <i class="bi bi-card-text text-secondary"></i> Descripción
+            </label>
+            <textarea class="form-control" id="descripcion" name="descripcion" rows="4" 
+                      placeholder="Describe los ingredientes, preparación o características especiales del producto..." 
+                      required minlength="10" maxlength="500" th:text="${producto.descripcion}"></textarea>
+            <div class="form-text d-flex justify-content-between">
+                <span><i class="bi bi-info-circle"></i> Descripción atractiva para el cliente</span>
+                <span id="contadorCaracteres" class="text-muted">0/500</span>
+            </div>
+        </div>
+
+        <!-- Stock -->
+        <div class="mb-3">
+            <label for="stock" class="form-label fw-bold">
+                <i class="bi bi-box-seam text-warning"></i> Stock Disponible
+            </label>
+            <div class="input-group">
+                <button class="btn btn-outline-secondary" type="button" id="btnRestarStock">
+                    <i class="bi bi-dash-lg"></i>
+                </button>
+                <input type="number" class="form-control text-center" id="stock" name="stock" 
+                       placeholder="0" min="0" required th:value="${producto.stock}">
+                <button class="btn btn-outline-secondary" type="button" id="btnSumarStock">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+            <div class="form-text">Cantidad de unidades disponibles</div>
+        </div>
+
+        <!-- Imagen con Drag & Drop -->
+        <div class="mb-3">
+            <label for="imagen" class="form-label fw-bold">
+                <i class="bi bi-image text-primary"></i> Imagen del Producto
+            </label>
+            
+            <div class="imagen-upload-area" id="imagenDropZone">
+                <input class="d-none" type="file" id="imagen" name="imagen" accept="image/*">
+                
+                <div id="imagenPlaceholder" class="text-center p-4">
+                    <i class="bi bi-cloud-upload fs-1 text-muted"></i>
+                    <p class="mb-0 mt-2">
+                        <strong>Arrastra una imagen aquí</strong> o haz clic para seleccionar
+                    </p>
+                    <small class="text-muted">PNG, JPG, JPEG (Max. 5MB)</small>
+                </div>
+                
+                <div id="imagenPreview" style="display: none;" class="position-relative">
+                    <img id="imagenPreviewImg" src="" alt="Vista previa" class="img-fluid rounded">
+                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" 
+                            id="btnEliminarImagen">
+                        <i class="bi bi-trash"></i> Quitar
+                    </button>
+                </div>
+            </div>
+            <div class="form-text">
+                <i class="bi bi-info-circle"></i> Imagen de alta calidad para mejor presentación
+            </div>
+        </div>
+
+        <!-- Disponibilidad -->
+        <div class="mb-4">
+            <label class="form-label fw-bold">
+                <i class="bi bi-toggle-on text-success"></i> Estado del Producto
+            </label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="disponible" name="disponible" 
+                       th:checked="${producto.estado}" style="width: 3em; height: 1.5em;">
+                <label class="form-check-label ms-2" for="disponible">
+                    <span id="estadoTexto" class="badge bg-success">Disponible para ordenar</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-save"></i>
+                <span th:if="${producto.idProducto == null}">Añadir Producto</span>
+                <span th:if="${producto.idProducto != null}">Actualizar Producto</span>
+            </button>
+            <button type="reset" class="btn btn-outline-secondary" id="btnLimpiarForm">
+                <i class="bi bi-arrow-counterclockwise"></i> Limpiar Formulario
+            </button>
+        </div>
+    </form>
+</div>

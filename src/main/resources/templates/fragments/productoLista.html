@@ -1,0 +1,27 @@
+<!-- fragments/productoLista.html -->
+<ul class="list-group" id="listaProductos" th:fragment="productoListaFragment">
+    <li class="list-group-item d-flex justify-content-between align-items-center"
+        th:each="productoItem : ${productos}">
+        <div>
+            <strong th:text="${productoItem.nombre}">Nombre del Producto</strong>
+            <span class="badge categoria-badge ms-2"
+                  th:text="${productoItem.nombreCategoria != null ? productoItem.nombreCategoria : 'Sin categoría'}">Categoría</span>
+            <span class="badge ms-2"
+                  th:classappend="${productoItem.estado} ? 'bg-success' : 'bg-secondary'"
+                  th:text="${productoItem.estado} ? 'Disponible' : 'No disponible'">
+                Estado
+            </span>
+        </div>
+        <div>
+            <a th:href="@{/productos/{id}(id=${productoItem.idProducto})}"
+               class="btn btn-sm btn-outline-primary me-1">
+                <i class="fas fa-edit"></i>
+            </a>
+            <a th:href="@{/productos/eliminar/{id}(id=${productoItem.idProducto})}"
+               class="btn btn-sm btn-outline-danger"
+               onclick="return confirm('¿Estás seguro de eliminar este producto?')">
+                <i class="fas fa-trash"></i>
+            </a>
+        </div>
+    </li>
+</ul>

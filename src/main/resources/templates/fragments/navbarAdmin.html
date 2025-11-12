@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="https://www.thymeleaf.org">
+
+<body>
+
+    <!-- Barra lateral -->
+    <div th:fragment="navbarA(activeTab)" class="sidebar">
+        <div class="sidebar-header">
+            <h3>UTPedidos</h3>
+            <p>Panel de Administración</p>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'productos' ? 'active' : ''}" th:href="@{/productos}"><i
+                        class="bi bi-tag"></i>Productos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'categorias' ? 'active' : ''}" th:href="@{/categorias}"><i
+                        class="bi bi-folder"></i>Categorías</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'edicion' ? 'active' : ''}" th:href="@{/productos/edicion}"><i
+                        class="bi bi-pencil-square"></i>Edición de productos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'pendientes' ? 'active' : ''}" th:href="@{/pedidos/admin}"><i
+                        class="fas fa-list me-2"></i>Pedidos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'enviados' ? 'active' : ''}" th:href="@{/pedidos/enviados}"><i
+                        class="fas fa-list me-2"></i>Pedidos Enviados</a>
+            </li>
+            <li class="nav-item" th:if="${usuarioAdmins == 'ADMINISTRADOR'}">
+                <a class="nav-link" th:classappend="${activeTab == 'usuarios' ? 'active' : ''}" th:href="@{/usuarios/panelAdmin}"><i
+                        class="fas fa-cog me-2"></i>Usuarios</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'menuDia' ? 'active' : ''}" th:href="@{/menuDia/}"><i
+                        class="bi bi-list-ul"></i>Menu del dia</a>
+            </li>
+<!--            <li class="nav-item">-->
+<!--                <a class="nav-link" th:classappend="${activeTab == 'ventas' ? 'active' : ''}" th:href="@{/ventas2}"><i-->
+<!--                        class="bi bi-list-ul"></i>Ventas</a>-->
+<!--            </li>-->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == 'board' ? 'active' : ''}" th:href="@{/ventas}"><i
+                        class="bi bi-list-ul"></i>DashBoard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activeTab == '' ? '' : ''}" th:href="@{/login/medio}"><i
+                        class="bi bi-box-arrow-right"></i>Salir</a>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layoutAdmin :: layoutA(~{::title},'', ~{::main}, ~{::script})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Estadisticas</title>
+</head>
+<body>
+<main>
+  <!-- Contenido principal -->
+  <div class="col-md-9 main-content">
+    <h2 class="mb-4 mt-4">Panel de Estadísticas de Productos Vendidos</h2>
+    <div th:replace="~{fragments/estadisticasProducto :: estadisticasProductoFragment}"></div>
+    <!-- <a th:href="@{/productos}" class="btn btn-secondary mt-4">Volver al Panel de Productos</a> -->
+  </div>
+</main>
+<script></script>
+</body>
+</html>
