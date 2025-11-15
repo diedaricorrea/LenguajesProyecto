@@ -13,11 +13,11 @@
             </span>
         </div>
         <div>
-            <a th:href="@{/productos/{id}(id=${productoItem.idProducto})}"
+            <a th:href="@{/admin/productos/{id}/editar(id=${productoItem.idProducto})}"
                class="btn btn-sm btn-outline-primary me-1">
                 <i class="fas fa-edit"></i>
             </a>
-            <a th:href="@{/productos/eliminar/{id}(id=${productoItem.idProducto})}"
+            <a th:href="@{/admin/productos/{id}/desactivar(id=${productoItem.idProducto})}"
                class="btn btn-sm btn-outline-danger"
                onclick="return confirm('¿Estás seguro de eliminar este producto?')">
                 <i class="fas fa-trash"></i>

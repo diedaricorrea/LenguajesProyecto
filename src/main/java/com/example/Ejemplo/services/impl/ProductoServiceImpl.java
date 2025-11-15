@@ -213,6 +213,34 @@ public class ProductoServiceImpl implements ProductoService {
         
         log.info("Producto desactivado exitosamente: {}", id);
     }
+    
+    @Override
+    @Transactional
+    public void activarProducto(Integer id) {
+        log.info("Activando producto ID: {}", id);
+        
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con ID: " + id));
+        
+        producto.setEstado(true);
+        productoRepository.save(producto);
+        
+        log.info("Producto activado exitosamente: {}", id);
+    }
+    
+    @Override
+    @Transactional
+    public void cambiarEstado(Integer id, Boolean nuevoEstado) {
+        log.info("Cambiando estado del producto ID: {} a {}", id, nuevoEstado);
+        
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con ID: " + id));
+        
+        producto.setEstado(nuevoEstado);
+        productoRepository.save(producto);
+        
+        log.info("Estado del producto actualizado exitosamente: {}", id);
+    }
 
     @Override
     @Transactional

@@ -11,16 +11,12 @@
         </div>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'productos' ? 'active' : ''}" th:href="@{/productos}"><i
-                        class="bi bi-tag"></i>Productos</a>
+                <a class="nav-link" th:classappend="${activeTab == 'productos' ? 'active' : ''}" th:href="@{/admin/productos}"><i
+                        class="bi bi-box-seam"></i>Gestion de Productos</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:classappend="${activeTab == 'categorias' ? 'active' : ''}" th:href="@{/categorias}"><i
-                        class="bi bi-folder"></i>Categorías</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'edicion' ? 'active' : ''}" th:href="@{/productos/edicion}"><i
-                        class="bi bi-pencil-square"></i>Edición de productos</a>
+                        class="bi bi-folder"></i>Categorias</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:classappend="${activeTab == 'pendientes' ? 'active' : ''}" th:href="@{/pedidos/admin}"><i

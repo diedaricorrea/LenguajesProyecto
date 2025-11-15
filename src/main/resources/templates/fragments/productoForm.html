@@ -1,6 +1,6 @@
 <!-- fragments/productoForm.html -->
 <div th:fragment="productoFormFragment">
-    <form th:action="@{/productos/subirproductos}" method="post" enctype="multipart/form-data" id="productoForm">
+    <form th:action="@{/admin/productos/guardar}" method="post" enctype="multipart/form-data" id="productoForm">
         <input type="hidden" name="id" th:value="${producto.idProducto}">
         
         <!-- Nombre del Producto -->

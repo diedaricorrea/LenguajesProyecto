@@ -88,6 +88,16 @@ public interface ProductoService {
     void deleteById(Integer id);
     
     /**
+     * Activa un producto (cambia estado a true)
+     */
+    void activarProducto(Integer id);
+    
+    /**
+     * Cambia el estado de un producto
+     */
+    void cambiarEstado(Integer id, Boolean nuevoEstado);
+    
+    /**
      * Elimina permanentemente un producto
      */
     void deletePermanently(Integer id);

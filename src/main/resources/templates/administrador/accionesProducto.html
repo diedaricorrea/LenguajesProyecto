@@ -32,11 +32,11 @@
 
         <!--barra de busqueda-->
         <div class="d-flex justify-content-center">
-            <form th:action="@{/productos/search}"  method="GET" class="mb-2 d-flex w-50 form-control">
-                <input type="text" class="form-control" placeholder="Buscar" name="nombre" id="nombre">
+            <form th:action="@{/admin/productos}"  method="GET" class="mb-2 d-flex w-50 form-control">
+                <input type="text" class="form-control" placeholder="Buscar" name="busqueda" id="busqueda">
                 <button type="submit" class="btn btn-primary">buscar</button>
             </form>
-            <a th:href="@{/productos/edicion}" class="fs-4 btn btn-primary"><i class="fa-solid fa-arrows-rotate"></i></a>
+            <a th:href="@{/admin/productos}" class="fs-4 btn btn-primary"><i class="fa-solid fa-arrows-rotate"></i></a>
         </div>
         <table class="table">
             <thead>
@@ -66,38 +66,26 @@
                              aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <form th:action="@{/productos/actualizar}" method="post">
+                                    <form th:action="@{/admin/productos/{id}/actualizar-stock(id=${producto.idProducto})}" method="post">
                                         <div class="modal-header">
-                                            <h5 class="modal-title">Actualizar producto</h5>
+                                            <h5 class="modal-title">Actualizar Stock</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <input type="hidden" name="idProducto" th:value="${producto.idProducto}" />
-
-                                            <div class="mb-3">
-                                                <label class="form-label">Nombre</label>
-                                                <input type="text" class="form-control" name="nombre" th:value="${producto.nombre}" required />
+                                            <div class="alert alert-info">
+                                                <strong>Producto:</strong> <span th:text="${producto.nombre}"></span><br>
+                                                <strong>Stock actual:</strong> <span th:text="${producto.stock}"></span> unidades
                                             </div>
 
                                             <div class="mb-3">
-                                                <label class="form-label">Precio</label>
-                                                <input type="number" class="form-control" name="precio" th:value="${producto.precio}" step="0.01" required />
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label class="form-label">Stock actual: <span th:text="${producto.stock}"></span> </label>
-                                                <p>El stock actual aumentara lo que coloques aqui</p>
-                                                <input type="number" class="form-control" name="stock" required />
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label class="form-label">Descripción</label>
-                                                <textarea class="form-control" name="descripcion" th:text="${producto.descripcion}" required></textarea>
+                                                <label class="form-label">Cantidad a agregar al stock</label>
+                                                <input type="number" class="form-control" name="stockAAgregar" min="1" required placeholder="Ingrese cantidad" />
+                                                <small class="text-muted">Se sumara al stock existente</small>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="submit" class="btn btn-success">Guardar cambios</button>
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-success">Guardar cambios</button>
                                         </div>
                                     </form>
                                 </div>
