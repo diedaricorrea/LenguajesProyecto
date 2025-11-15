@@ -15,77 +15,32 @@
             <div class="form-text">Nombre descriptivo que aparecerá en la carta</div>
         </div>
 
-        <!-- Categoría Mejorada -->
+        <!-- Categoria -->
         <div class="mb-3">
-            <label for="categoriaSearch" class="form-label fw-bold">
-                <i class="bi bi-collection-fill text-info"></i> Categoría
+            <label for="categoria" class="form-label fw-bold">
+                <i class="bi bi-collection-fill text-info"></i> Categoria
             </label>
-            
-            <!-- Búsqueda de categoría con autocompletar -->
-            <div class="categoria-selector-wrapper">
-                <div class="input-group">
-                    <span class="input-group-text bg-light">
-                        <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" class="form-control" id="categoriaSearch" 
-                           placeholder="Buscar o crear categoría..." 
-                           autocomplete="off">
-                    <button class="btn btn-outline-success" type="button" id="btnCrearCategoriaRapida" 
-                            title="Crear nueva categoría">
-                        <i class="bi bi-plus-lg"></i> Nueva
-                    </button>
-                </div>
-                
-                <!-- Select oculto que mantiene el valor real -->
-                <select class="d-none" id="categoria" name="categoria">
-                    <option value="">Seleccionar categoría</option>
+            <div class="input-group">
+                <span class="input-group-text bg-light">
+                    <i class="bi bi-tag"></i>
+                </span>
+                <select class="form-select" id="categoria" name="categoria" required>
+                    <option value="">-- Selecciona una categoria --</option>
                     <option th:each="cat : ${categorias}" 
                             th:value="${cat.nombre}" 
                             th:text="${cat.nombre}" 
                             th:selected="${producto.nombreCategoria != null && producto.nombreCategoria == cat.nombre}">
+                        Categoria
                     </option>
                 </select>
-                
-                <!-- Lista de sugerencias -->
-                <div id="categoriasSugerencias" class="categoria-sugerencias" style="display: none;"></div>
-                
-                <!-- Categoría seleccionada -->
-                <div id="categoriaSeleccionada" class="categoria-seleccionada mt-2" style="display: none;">
-                    <span class="badge bg-info fs-6 p-2">
-                        <i class="bi bi-bookmark-fill"></i>
-                        <span id="categoriaTexto"></span>
-                        <button type="button" class="btn-close btn-close-white ms-2" 
-                                id="btnLimpiarCategoria" aria-label="Quitar"></button>
-                    </span>
-                </div>
+                <button class="btn btn-outline-primary" type="button" 
+                        data-bs-toggle="modal" data-bs-target="#modalNuevaCategoria"
+                        title="Crear nueva categoria">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
             </div>
             <div class="form-text">
-                <i class="bi bi-info-circle"></i> Escribe para buscar o crear una nueva categoría
-            </div>
-        </div>
-
-        <!-- Modal para crear categoría nueva -->
-        <div id="modalNuevaCategoria" class="categoria-modal" style="display: none;">
-            <div class="categoria-modal-content">
-                <div class="categoria-modal-header">
-                    <h5><i class="bi bi-folder-plus"></i> Crear Nueva Categoría</h5>
-                    <button type="button" class="btn-close" id="btnCerrarModalCategoria"></button>
-                </div>
-                <div class="categoria-modal-body">
-                    <div class="mb-3">
-                        <label for="nuevaCategoriaNombre" class="form-label">Nombre de la categoría</label>
-                        <input type="text" class="form-control" id="nuevaCategoriaNombre" 
-                               placeholder="Ej: Entradas, Platos Principales, Postres..." 
-                               maxlength="100">
-                        <div class="form-text">La categoría se creará y seleccionará automáticamente</div>
-                    </div>
-                </div>
-                <div class="categoria-modal-footer">
-                    <button type="button" class="btn btn-secondary" id="btnCancelarModalCategoria">Cancelar</button>
-                    <button type="button" class="btn btn-success" id="btnConfirmarNuevaCategoria">
-                        <i class="bi bi-check-circle"></i> Crear Categoría
-                    </button>
-                </div>
+                <i class="bi bi-info-circle"></i> Selecciona o crea una nueva categoria
             </div>
         </div>
 

@@ -116,19 +116,28 @@
                                         <span class="input-group-text">
                                             <i class="bi bi-tag"></i>
                                         </span>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="categoria" 
-                                               name="categoria" 
-                                               list="categoriasDatalist"
-                                               th:value="${producto.nombreCategoria}"
-                                               placeholder="Selecciona o escribe una nueva"
-                                               required>
+                                        <select class="form-select" 
+                                                id="categoria" 
+                                                name="categoria" 
+                                                required>
+                                            <option value="">-- Selecciona una categoria --</option>
+                                            <option th:each="cat : ${categorias}" 
+                                                    th:value="${cat.nombre}"
+                                                    th:text="${cat.nombre}"
+                                                    th:selected="${producto.nombreCategoria != null && producto.nombreCategoria == cat.nombre}">
+                                                Categoria
+                                            </option>
+                                        </select>
+                                        <button class="btn btn-outline-primary" type="button" 
+                                                data-bs-toggle="modal" data-bs-target="#modalNuevaCategoria"
+                                                title="Crear nueva categoria">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
                                     </div>
-                                    <datalist id="categoriasDatalist">
-                                        <option th:each="cat : ${categorias}" th:value="${cat.nombre}"></option>
-                                    </datalist>
-                                    <div class="form-text">Selecciona una existente o escribe una nueva</div>
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle"></i>
+                                        Selecciona o crea una nueva categoria
+                                    </div>
                                 </div>
 
                                 <!-- Descripcion -->
@@ -245,6 +254,44 @@
         </main>
     </div>
 
+    <!-- Modal para crear nueva categoria -->
+    <div class="modal fade" id="modalNuevaCategoria" tabindex="-1" aria-labelledby="modalNuevaCategoriaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalNuevaCategoriaLabel">
+                        <i class="bi bi-plus-circle"></i> Nueva Categoria
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formNuevaCategoria">
+                        <div class="mb-3">
+                            <label for="nombreCategoria" class="form-label">
+                                Nombre <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="nombreCategoria" 
+                                   placeholder="Ej: Bebidas Frias, Postres..." required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcionCategoria" class="form-label">Descripcion</label>
+                            <textarea class="form-control" id="descripcionCategoria" rows="3"
+                                      placeholder="Descripcion opcional de la categoria..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnGuardarCategoria">
+                        <i class="bi bi-save"></i> Guardar Categoria
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
@@ -289,6 +336,198 @@
                 alert('El stock no puede ser negativo');
                 return false;
             }
+        });
+
+        // EXPLICACION PARA QUE ENTIENDAN EL FUNCIONAMIENTO DEL MODAL DE CREACION DE CATEGORIAS USANDO AJAX Y FETCH API SIN CAMBIAR EL POST DEL BACKEND
+        
+        /*
+         * ============================================================================
+         * MODAL DE CREACIÓN DE CATEGORÍAS - DOCUMENTACIÓN COMPLETA
+         * ============================================================================
+         * 
+         * PROBLEMA ORIGINAL:
+         * - El link a /admin/categorias/nueva abría una nueva pestaña
+         * - Se perdía el contexto del formulario de producto
+         * - Mala experiencia de usuario (navegación innecesaria)
+         * 
+         * SOLUCIÓN IMPLEMENTADA:
+         * Modal de Bootstrap que permite crear categorías sin salir del formulario
+         * 
+         * ============================================================================
+         * CÓMO FUNCIONA (SIN NECESIDAD DE NUEVA API REST)
+         * ============================================================================
+         * 
+         * 1. REUTILIZACIÓN DE ENDPOINT EXISTENTE:
+         *    - El modal usa el mismo endpoint que el formulario normal de categorías
+         *    - Endpoint: POST /admin/categorias/guardar
+         *    - Este endpoint YA EXISTE en CategoriaAdminController.java
+         * 
+         * 2. DIFERENCIA CLAVE:
+         *    ┌─────────────────────┬──────────────────────────────────────────┐
+         *    │ Formulario Normal   │ Modal (AJAX)                             │
+         *    ├─────────────────────┼──────────────────────────────────────────┤
+         *    │ <form action="..."> │ fetch('/admin/categorias/guardar')       │
+         *    │ Recarga la página   │ NO recarga la página                     │
+         *    │ Navega a otra vista │ Permanece en la misma vista              │
+         *    │ Redirect server     │ Manipulación del DOM con JavaScript      │
+         *    └─────────────────────┴──────────────────────────────────────────┘
+         * 
+         * 3. TECNOLOGÍA USADA:
+         *    - Fetch API: Para hacer peticiones HTTP asíncronas (AJAX)
+         *    - No requiere jQuery ni librerías adicionales
+         *    - Nativo de JavaScript moderno (ES6+)
+         * 
+         * 4. FLUJO COMPLETO:
+         * 
+         *    [PASO 1] Usuario hace clic en botón "+" junto al select de categorías
+         *             ↓
+         *    [PASO 2] Se abre el modal de Bootstrap (id="modalNuevaCategoria")
+         *             ↓
+         *    [PASO 3] Usuario ingresa nombre y descripción
+         *             ↓
+         *    [PASO 4] Usuario hace clic en "Guardar Categoría"
+         *             ↓
+         *    [PASO 5] JavaScript captura el evento y hace validación
+         *             ↓
+         *    [PASO 6] Se envía petición POST al servidor usando Fetch API
+         *             ├── URL: /admin/categorias/guardar
+         *             ├── Method: POST
+         *             ├── Headers: application/x-www-form-urlencoded
+         *             └── Body: nombre=XXX&descripcion=YYY
+         *             ↓
+         *    [PASO 7] El servidor procesa la petición (CategoriaAdminController)
+         *             ├── Valida los datos
+         *             ├── Crea la categoría en la base de datos
+         *             └── Retorna respuesta HTTP 200 OK (o error)
+         *             ↓
+         *    [PASO 8] JavaScript recibe la respuesta del servidor
+         *             ↓
+         *    [PASO 9] Si es exitoso:
+         *             ├── Crea un nuevo <option> con la categoría
+         *             ├── Lo agrega al <select id="categoria">
+         *             ├── Lo selecciona automáticamente
+         *             ├── Cierra el modal
+         *             ├── Limpia el formulario del modal
+         *             └── Muestra notificación de éxito (3 segundos)
+         *             ↓
+         *    [PASO 10] Usuario continúa con el formulario de producto
+         *              (La nueva categoría ya está seleccionada)
+         * 
+         * ============================================================================
+         * CÓDIGO DETALLADO CON EXPLICACIONES
+         * ============================================================================
+         */
+        
+        // Crear nueva categoria desde el modal
+        document.getElementById('btnGuardarCategoria').addEventListener('click', function() {
+            // 1. OBTENER VALORES DEL FORMULARIO
+            //    - trim() elimina espacios en blanco al inicio y final
+            const nombre = document.getElementById('nombreCategoria').value.trim();
+            const descripcion = document.getElementById('descripcionCategoria').value.trim();
+            
+            // 2. VALIDACIÓN CLIENTE (antes de enviar al servidor)
+            if (!nombre) {
+                alert('El nombre de la categoria es obligatorio');
+                return; // Detener ejecución si no hay nombre
+            }
+            
+            // 3. UI FEEDBACK - Deshabilitar botón para evitar clicks múltiples
+            const btnGuardar = document.getElementById('btnGuardarCategoria');
+            btnGuardar.disabled = true;
+            btnGuardar.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
+            
+            // 4. PETICIÓN ASÍNCRONA AL SERVIDOR
+            //    FETCH API - Permite hacer peticiones HTTP sin recargar la página
+            fetch('/admin/categorias/guardar', {
+                // Método HTTP: POST (mismo que el formulario normal usa)
+                method: 'POST',
+                
+                // Headers: Le dice al servidor qué tipo de datos enviamos
+                // application/x-www-form-urlencoded es el formato de formularios HTML estándar
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                
+                // Body: Los datos que enviamos al servidor
+                // URLSearchParams convierte objeto JavaScript a formato de formulario
+                // Equivalente a: nombre=Bebidas&descripcion=Bebidas+frias
+                body: new URLSearchParams({
+                    'nombre': nombre,
+                    'descripcion': descripcion
+                })
+            })
+            // 5. PROCESAR RESPUESTA DEL SERVIDOR
+            .then(response => {
+                // response.ok es true si el código HTTP está entre 200-299
+                if (response.ok) {
+                    // 6. ACTUALIZAR EL DOM - Agregar la nueva categoría al select
+                    //    Esto se hace en el cliente, sin recargar la página
+                    const select = document.getElementById('categoria');
+                    const option = document.createElement('option'); // Crear nuevo <option>
+                    option.value = nombre;  // El value que se envía al servidor
+                    option.text = nombre;   // El texto visible para el usuario
+                    option.selected = true; // Seleccionarla automáticamente
+                    select.add(option);     // Agregarla al <select>
+                    
+                    // 7. CERRAR MODAL - Obtener instancia del modal de Bootstrap
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('modalNuevaCategoria'));
+                    modal.hide(); // Cerrar el modal
+                    document.getElementById('formNuevaCategoria').reset(); // Limpiar inputs
+                    
+                    // 8. MOSTRAR NOTIFICACIÓN DE ÉXITO
+                    //    Crear un alert flotante que se auto-elimina después de 3 segundos
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3';
+                    alertDiv.style.zIndex = '9999'; // Asegurar que esté sobre todo
+                    alertDiv.innerHTML = `
+                        <i class="bi bi-check-circle"></i> Categoria "${nombre}" creada exitosamente
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.body.appendChild(alertDiv); // Agregar al DOM
+                    setTimeout(() => alertDiv.remove(), 3000); // Auto-eliminar en 3 segundos
+                } else {
+                    // Si el servidor respondió con error (400, 500, etc.)
+                    alert('Error al crear la categoria. Intenta de nuevo.');
+                }
+            })
+            // 9. MANEJAR ERRORES DE RED
+            //    Si no hay conexión, el servidor no responde, etc.
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al crear la categoria. Verifica tu conexion.');
+            })
+            // 10. FINALLY - Se ejecuta siempre (éxito o error)
+            //     Rehabilitar el botón para permitir intentos nuevos
+            .finally(() => {
+                btnGuardar.disabled = false;
+                btnGuardar.innerHTML = '<i class="bi bi-save"></i> Guardar Categoria';
+            });
+        });
+        
+        /*
+         * ============================================================================
+         * EVENTO DE LIMPIEZA DEL MODAL
+         * ============================================================================
+         * 
+         * PROPÓSITO:
+         * - Limpiar los campos del formulario cuando el modal se cierra
+         * - Evita que datos antiguos aparezcan si se reabre el modal
+         * 
+         * EVENTO: 'hidden.bs.modal'
+         * - Es un evento de Bootstrap que se dispara DESPUÉS de que el modal se cierra
+         * - Garantiza que la animación de cierre termine antes de limpiar
+         * 
+         * POR QUÉ ES NECESARIO:
+         * - Si el usuario cierra el modal con "X" o "Cancelar" sin guardar
+         * - Los datos ingresados quedarían en los inputs
+         * - Al reabrir el modal, vería los datos antiguos
+         * 
+         * ALTERNATIVAS:
+         * - También limpiamos con .reset() después de guardar exitosamente
+         * - Este evento es para casos donde se cierra sin guardar
+         */
+        document.getElementById('modalNuevaCategoria').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('formNuevaCategoria').reset();
         });
     </script>
 </body>
