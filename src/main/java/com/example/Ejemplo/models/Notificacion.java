@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "notificaciones")
 public class Notificacion {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idNotificacion;
 
     @ManyToOne
