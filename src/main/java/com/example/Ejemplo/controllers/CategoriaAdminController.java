@@ -45,7 +45,7 @@ public class CategoriaAdminController {
             Usuario usuario = userDetails.getUsuario();
             log.info("Usuario {} accediendo a gestion de categorias", usuario.getCorreo());
 
-            List<CategoriaResponseDTO> categorias = categoriaService.findAllWithDetails();
+            List<CategoriaResponseDTO> categorias = categoriaService.obtenerTodasConDetalles();
             
             // Filtrar por busqueda si se proporciona
             if (busqueda != null && !busqueda.trim().isEmpty()) {
@@ -97,7 +97,7 @@ public class CategoriaAdminController {
             @AuthenticationPrincipal UsuarioDetails userDetails,
             RedirectAttributes redirectAttributes) {
         try {
-            CategoriaDTO categoria = categoriaService.findById(id)
+            CategoriaDTO categoria = categoriaService.buscarPorId(id)
                     .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrada"));
             
             Usuario usuario = userDetails.getUsuario();
@@ -152,13 +152,13 @@ public class CategoriaAdminController {
         try {
             if (categoriaDTO.getIdCategoria() == null) {
                 // Crear nueva categoria
-                CategoriaDTO createdCategoria = categoriaService.create(categoriaDTO);
+                CategoriaDTO createdCategoria = categoriaService.crear(categoriaDTO);
                 log.info("Categoria creada: ID={}, Nombre={}", createdCategoria.getIdCategoria(), createdCategoria.getNombre());
                 redirectAttributes.addFlashAttribute("mensaje", "Categoria creada correctamente");
                 redirectAttributes.addFlashAttribute("tipoMensaje", "success");
             } else {
                 // Actualizar categoria existente
-                CategoriaDTO updatedCategoria = categoriaService.update(categoriaDTO.getIdCategoria(), categoriaDTO);
+                CategoriaDTO updatedCategoria = categoriaService.actualizar(categoriaDTO.getIdCategoria(), categoriaDTO);
                 log.info("Categoria actualizada: ID={}", updatedCategoria.getIdCategoria());
                 redirectAttributes.addFlashAttribute("mensaje", "Categoria actualizada correctamente");
                 redirectAttributes.addFlashAttribute("tipoMensaje", "success");
@@ -183,7 +183,7 @@ public class CategoriaAdminController {
     @PreAuthorize("hasAnyAuthority('CATEGORIAS_ELIMINAR', 'CATEGORIAS_GESTIONAR', 'ROLE_ADMINISTRADOR')")
     public String eliminarCategoria(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
-            long cantidadProductos = categoriaService.countProductosByCategoria(id);
+            long cantidadProductos = categoriaService.contarProductosPorCategoria(id);
             
             if (cantidadProductos > 0) {
                 log.warn("Intento de eliminar categoria con productos asociados. ID={}, Productos={}", id, cantidadProductos);
@@ -191,7 +191,7 @@ public class CategoriaAdminController {
                     "No se puede eliminar la categoria porque tiene " + cantidadProductos + " producto(s) asociado(s)");
                 redirectAttributes.addFlashAttribute("tipoMensaje", "warning");
             } else {
-                categoriaService.deleteById(id);
+                categoriaService.eliminarPorId(id);
                 log.info("Categoria eliminada: ID={}", id);
                 redirectAttributes.addFlashAttribute("mensaje", "Categoria eliminada correctamente");
                 redirectAttributes.addFlashAttribute("tipoMensaje", "success");
@@ -217,7 +217,7 @@ public class CategoriaAdminController {
     @PreAuthorize("hasAnyAuthority('CATEGORIAS_VER', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR', 'ROLE_USUARIO')")
     public ResponseEntity<List<CategoriaDTO>> listarCategoriasAPI() {
         log.debug("API: Listando todas las categorias");
-        return ResponseEntity.ok(categoriaService.findAll());
+        return ResponseEntity.ok(categoriaService.obtenerTodas());
     }
 
     /**
@@ -228,7 +228,7 @@ public class CategoriaAdminController {
     @PreAuthorize("hasAnyAuthority('CATEGORIAS_VER', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
     public ResponseEntity<Map<String, Boolean>> existeCategoria(@RequestParam String nombre) {
         log.debug("API: Verificando existencia de categoria: {}", nombre);
-        boolean existe = categoriaService.existsByNombre(nombre);
+        boolean existe = categoriaService.existePorNombre(nombre);
         return ResponseEntity.ok(Map.of("existe", existe));
     }
 }

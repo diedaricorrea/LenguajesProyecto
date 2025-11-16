@@ -39,7 +39,7 @@ public class ProductoServiceImpl implements ProductoService {
     // ============= CONSULTAS =============
 
     @Override
-    public List<ProductoDTO> findAll() {
+    public List<ProductoDTO> obtenerTodos() {
         log.debug("Obteniendo todos los productos");
         return productoRepository.findAll().stream()
                 .map(productoMapper::toDTO)
@@ -47,7 +47,7 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public List<ProductoResponseDTO> findAllWithDetails() {
+    public List<ProductoResponseDTO> obtenerTodosConDetalles() {
         log.debug("Obteniendo todos los productos con detalles");
         return productoRepository.findAll().stream()
                 .map(productoMapper::toResponseDTO)
@@ -55,28 +55,28 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public Optional<ProductoDTO> findById(Integer id) {
+    public Optional<ProductoDTO> buscarPorId(Integer id) {
         log.debug("Buscando producto por ID: {}", id);
         return productoRepository.findById(id)
                 .map(productoMapper::toDTO);
     }
 
     @Override
-    public Optional<ProductoResponseDTO> findByIdWithDetails(Integer id) {
+    public Optional<ProductoResponseDTO> buscarPorIdConDetalles(Integer id) {
         log.debug("Buscando producto con detalles por ID: {}", id);
         return productoRepository.findById(id)
                 .map(productoMapper::toResponseDTO);
     }
 
     @Override
-    public Optional<ProductoDTO> findByNombre(String nombre) {
+    public Optional<ProductoDTO> buscarPorNombre(String nombre) {
         log.debug("Buscando producto por nombre: {}", nombre);
         List<Producto> productos = productoRepository.findByNombreContaining(nombre);
         return productos.isEmpty() ? Optional.empty() : Optional.of(productoMapper.toDTO(productos.get(0)));
     }
 
     @Override
-    public List<ProductoDTO> findRecent(int limit) {
+    public List<ProductoDTO> obtenerRecientes(int limit) {
         log.debug("Obteniendo los {} productos más recientes", limit);
         Pageable pageable = PageRequest.of(0, limit);
         return productoRepository.findAll(pageable).stream()
@@ -85,7 +85,7 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public List<ProductoDTO> findByNombreContaining(String nombre) {
+    public List<ProductoDTO> buscarPorNombreContiene(String nombre) {
         log.debug("Buscando productos que contengan: {}", nombre);
         return productoRepository.findByNombreContainingIgnoreCase(nombre.toLowerCase()).stream()
                 .map(productoMapper::toDTO)
@@ -95,14 +95,14 @@ public class ProductoServiceImpl implements ProductoService {
     // ============= PAGINACIÓN =============
 
     @Override
-    public Page<ProductoDTO> findAllPaginado(Pageable pageable) {
+    public Page<ProductoDTO> obtenerTodosPaginado(Pageable pageable) {
         log.debug("Obteniendo productos paginados: página {}", pageable.getPageNumber());
         return productoRepository.findAll(pageable)
                 .map(productoMapper::toDTO);
     }
 
     @Override
-    public Page<ProductoDTO> findByCategoriaPaginado(String nombreCategoria, Pageable pageable) {
+    public Page<ProductoDTO> obtenerPorCategoriaPaginado(String nombreCategoria, Pageable pageable) {
         log.debug("Obteniendo productos de categoría '{}' paginados", nombreCategoria);
         return productoRepository.findByCategoriaNombre(nombreCategoria, pageable)
                 .map(productoMapper::toDTO);
@@ -113,9 +113,9 @@ public class ProductoServiceImpl implements ProductoService {
         log.debug("Buscando productos - Categoría: {}, Nombre: {}", categoria, nombre);
         
         if ((categoria == null || categoria.isEmpty()) && (nombre == null || nombre.isEmpty())) {
-            return findAllPaginado(pageable);
+            return obtenerTodosPaginado(pageable);
         } else if (categoria != null && !categoria.isEmpty() && (nombre == null || nombre.isEmpty())) {
-            return findByCategoriaPaginado(categoria, pageable);
+            return obtenerPorCategoriaPaginado(categoria, pageable);
         } else if ((categoria == null || categoria.isEmpty()) && nombre != null && !nombre.isEmpty()) {
             return productoRepository.findByNombreContainingIgnoreCase(nombre, pageable)
                     .map(productoMapper::toDTO);
@@ -129,7 +129,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
-    public ProductoDTO create(ProductoCreateDTO createDTO, MultipartFile imagen) {
+    public ProductoDTO crear(ProductoCreateDTO createDTO, MultipartFile imagen) {
         log.info("Creando nuevo producto: {}", createDTO.getNombre());
         
         // Validar datos
@@ -163,7 +163,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
-    public ProductoDTO update(Integer id, ProductoCreateDTO updateDTO, MultipartFile imagen) {
+    public ProductoDTO actualizar(Integer id, ProductoCreateDTO updateDTO, MultipartFile imagen) {
         log.info("Actualizando producto ID: {}", id);
         
         Producto producto = productoRepository.findById(id)
@@ -203,7 +203,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
-    public void deleteById(Integer id) {
+    public void eliminarPorId(Integer id) {
         log.info("Desactivando producto ID: {}", id);
         
         Producto producto = productoRepository.findById(id)
@@ -245,7 +245,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
-    public void deletePermanently(Integer id) {
+    public void eliminarPermanentemente(Integer id) {
         log.warn("Eliminando permanentemente producto ID: {}", id);
         
         if (!productoRepository.existsById(id)) {
@@ -296,14 +296,14 @@ public class ProductoServiceImpl implements ProductoService {
     // ============= VALIDACIONES =============
 
     @Override
-    public boolean isDisponible(Integer idProducto) {
+    public boolean estaDisponible(Integer idProducto) {
         return productoRepository.findById(idProducto)
                 .map(Producto::isDisponible)
                 .orElse(false);
     }
 
     @Override
-    public boolean existsByNombre(String nombre) {
+    public boolean existePorNombre(String nombre) {
         return !productoRepository.findByNombreContaining(nombre).isEmpty();
     }
 

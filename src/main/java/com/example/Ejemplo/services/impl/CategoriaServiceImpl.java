@@ -29,7 +29,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     private final CategoriaMapper categoriaMapper;
 
     @Override
-    public List<CategoriaDTO> findAll() {
+    public List<CategoriaDTO> obtenerTodas() {
         log.debug("Obteniendo todas las categorías como DTOs");
         return categoriaRepository.findAll().stream()
                 .map(categoriaMapper::toDTO)
@@ -37,7 +37,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
-    public List<CategoriaResponseDTO> findAllWithDetails() {
+    public List<CategoriaResponseDTO> obtenerTodasConDetalles() {
         log.debug("Obteniendo todas las categorías con detalles");
         List<Categoria> categorias = categoriaRepository.findAll();
         
@@ -57,21 +57,21 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
-    public Optional<CategoriaDTO> findById(Integer id) {
+    public Optional<CategoriaDTO> buscarPorId(Integer id) {
         log.debug("Buscando categoría por ID: {}", id);
         return categoriaRepository.findById(id)
                 .map(categoriaMapper::toDTO);
     }
 
     @Override
-    public Optional<CategoriaResponseDTO> findByIdWithDetails(Integer id) {
+    public Optional<CategoriaResponseDTO> buscarPorIdConDetalles(Integer id) {
         log.debug("Buscando categoría con detalles por ID: {}", id);
         return categoriaRepository.findById(id)
                 .map(categoriaMapper::toResponseDTO);
     }
 
     @Override
-    public Optional<CategoriaDTO> findByNombre(String nombre) {
+    public Optional<CategoriaDTO> buscarPorNombre(String nombre) {
         log.debug("Buscando categoría por nombre: {}", nombre);
         Categoria categoria = categoriaRepository.findByNombre(nombre);
         return Optional.ofNullable(categoria)
@@ -80,7 +80,7 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     @Transactional
-    public CategoriaDTO create(CategoriaCreateDTO createDTO) {
+    public CategoriaDTO crear(CategoriaCreateDTO createDTO) {
         log.info("Creando nueva categoría: {}", createDTO.getNombre());
         
         // Validar que el nombre no esté vacío
@@ -89,7 +89,7 @@ public class CategoriaServiceImpl implements CategoriaService {
         }
         
         // Validar que no exista otra categoría con el mismo nombre
-        if (existsByNombre(createDTO.getNombre().trim())) {
+        if (existePorNombre(createDTO.getNombre().trim())) {
             throw new IllegalArgumentException("Ya existe una categoría con el nombre: " + createDTO.getNombre());
         }
         
@@ -102,7 +102,7 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     @Transactional
-    public CategoriaDTO update(Integer id, CategoriaCreateDTO updateDTO) {
+    public CategoriaDTO actualizar(Integer id, CategoriaCreateDTO updateDTO) {
         log.info("Actualizando categoría ID: {}", id);
         
         Categoria categoria = categoriaRepository.findById(id)
@@ -123,7 +123,7 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     @Transactional
-    public void deleteById(Integer id) {
+    public void eliminarPorId(Integer id) {
         log.info("Intentando eliminar categoría ID: {}", id);
         
         // Verificar que la categoría existe
@@ -132,7 +132,7 @@ public class CategoriaServiceImpl implements CategoriaService {
         }
         
         // Verificar si la categoría tiene productos asociados
-        long cantidadProductos = countProductosByCategoria(id);
+        long cantidadProductos = contarProductosPorCategoria(id);
         if (cantidadProductos > 0) {
             throw new IllegalStateException(
                 "No se puede eliminar la categoría porque tiene " + cantidadProductos + " producto(s) asociado(s)"
@@ -144,18 +144,18 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
-    public boolean existsByNombre(String nombre) {
+    public boolean existePorNombre(String nombre) {
         return categoriaRepository.findByNombre(nombre) != null;
     }
 
     @Override
-    public long countProductosByCategoria(Integer idCategoria) {
+    public long contarProductosPorCategoria(Integer idCategoria) {
         // Usar el método optimizado del repositorio que no carga la colección
         return categoriaRepository.countProductosByCategoria(idCategoria);
     }
 
     @Override
-    public boolean canBeDeleted(Integer idCategoria) {
-        return countProductosByCategoria(idCategoria) == 0;
+    public boolean puedeSerEliminada(Integer idCategoria) {
+        return contarProductosPorCategoria(idCategoria) == 0;
     }
 }

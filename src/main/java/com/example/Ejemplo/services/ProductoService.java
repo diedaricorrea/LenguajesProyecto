@@ -21,71 +21,71 @@ public interface ProductoService {
     /**
      * Obtiene todos los productos como DTOs simples
      */
-    List<ProductoDTO> findAll();
+    List<ProductoDTO> obtenerTodos();
     
     /**
      * Obtiene todos los productos con detalles completos
      */
-    List<ProductoResponseDTO> findAllWithDetails();
+    List<ProductoResponseDTO> obtenerTodosConDetalles();
     
     /**
      * Busca un producto por ID
      */
-    Optional<ProductoDTO> findById(Integer id);
+    Optional<ProductoDTO> buscarPorId(Integer id);
     
     /**
      * Busca un producto por ID con detalles completos
      */
-    Optional<ProductoResponseDTO> findByIdWithDetails(Integer id);
+    Optional<ProductoResponseDTO> buscarPorIdConDetalles(Integer id);
     
     /**
      * Busca producto por nombre
      */
-    Optional<ProductoDTO> findByNombre(String nombre);
+    Optional<ProductoDTO> buscarPorNombre(String nombre);
     
     /**
      * Obtiene productos recientes (últimos agregados)
      */
-    List<ProductoDTO> findRecent(int limit);
+    List<ProductoDTO> obtenerRecientes(int limite);
     
     /**
      * Busca productos por nombre (case insensitive)
      */
-    List<ProductoDTO> findByNombreContaining(String nombre);
+    List<ProductoDTO> buscarPorNombreContiene(String nombre);
     
     // ============= PAGINACIÓN =============
     
     /**
      * Obtiene productos paginados
      */
-    Page<ProductoDTO> findAllPaginado(Pageable pageable);
+    Page<ProductoDTO> obtenerTodosPaginado(Pageable pageable);
     
     /**
      * Obtiene productos por categoría paginados
      */
-    Page<ProductoDTO> findByCategoriaPaginado(String nombreCategoria, Pageable pageable);
+    Page<ProductoDTO> obtenerPorCategoriaPaginado(String nombreCategoria, Pageable pageable);
     
     /**
      * Busca productos por categoría y/o nombre con paginación
      */
     Page<ProductoDTO> buscarPorCategoriaYNombre(String categoria, String nombre, Pageable pageable);
     
-    // ============= CRUD OPERATIONS =============
+    // ============= OPERACIONES CRUD =============
     
     /**
      * Crea un nuevo producto con imagen opcional
      */
-    ProductoDTO create(ProductoCreateDTO createDTO, MultipartFile imagen);
+    ProductoDTO crear(ProductoCreateDTO createDTO, MultipartFile imagen);
     
     /**
      * Actualiza un producto existente
      */
-    ProductoDTO update(Integer id, ProductoCreateDTO updateDTO, MultipartFile imagen);
+    ProductoDTO actualizar(Integer id, ProductoCreateDTO updateDTO, MultipartFile imagen);
     
     /**
      * Elimina un producto (soft delete - cambia estado a false)
      */
-    void deleteById(Integer id);
+    void eliminarPorId(Integer id);
     
     /**
      * Activa un producto (cambia estado a true)
@@ -100,7 +100,7 @@ public interface ProductoService {
     /**
      * Elimina permanentemente un producto
      */
-    void deletePermanently(Integer id);
+    void eliminarPermanentemente(Integer id);
     
     // ============= GESTIÓN DE STOCK =============
     
@@ -124,10 +124,10 @@ public interface ProductoService {
     /**
      * Verifica si un producto está disponible para venta
      */
-    boolean isDisponible(Integer idProducto);
+    boolean estaDisponible(Integer idProducto);
     
     /**
      * Verifica si existe un producto con el nombre dado
      */
-    boolean existsByNombre(String nombre);
+    boolean existePorNombre(String nombre);
 }

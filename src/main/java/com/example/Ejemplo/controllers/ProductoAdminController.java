@@ -46,7 +46,7 @@ public class ProductoAdminController {
             Usuario usuario = userDetails.getUsuario();
             log.info("Usuario {} accediendo a gestion de productos", usuario.getCorreo());
 
-            List<ProductoResponseDTO> productos = productoService.findAllWithDetails();
+            List<ProductoResponseDTO> productos = productoService.obtenerTodosConDetalles();
             
             // Filtrar por busqueda si se proporciona
             if (busqueda != null && !busqueda.trim().isEmpty()) {
@@ -63,7 +63,7 @@ public class ProductoAdminController {
                     .toList();
             }
             
-            List<CategoriaDTO> categorias = categoriaService.findAll();
+            List<CategoriaDTO> categorias = categoriaService.obtenerTodas();
             
             log.debug("Listando productos. Total: {}", productos.size());
 
@@ -89,7 +89,7 @@ public class ProductoAdminController {
     @PreAuthorize("hasAnyAuthority('PRODUCTOS_CREAR', 'PRODUCTOS_GESTIONAR', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
     public String nuevoProducto(Model model, @AuthenticationPrincipal UsuarioDetails userDetails) {
         Usuario usuario = userDetails.getUsuario();
-        List<CategoriaDTO> categorias = categoriaService.findAll();
+        List<CategoriaDTO> categorias = categoriaService.obtenerTodas();
         
         String rolNombre = usuario.getRol() != null ? usuario.getRol().toString() : "USUARIO";
         model.addAttribute("usuarioAdmins", rolNombre);
@@ -112,10 +112,10 @@ public class ProductoAdminController {
             @AuthenticationPrincipal UsuarioDetails userDetails,
             RedirectAttributes redirectAttributes) {
         try {
-            ProductoResponseDTO producto = productoService.findByIdWithDetails(id)
+            ProductoResponseDTO producto = productoService.buscarPorIdConDetalles(id)
                     .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
             
-            List<CategoriaDTO> categorias = categoriaService.findAll();
+            List<CategoriaDTO> categorias = categoriaService.obtenerTodas();
             Usuario usuario = userDetails.getUsuario();
             
             // Convertir a CreateDTO para el formulario
@@ -185,12 +185,12 @@ public class ProductoAdminController {
             }
             
             // Obtener o crear categoria
-            CategoriaDTO categoria = categoriaService.findByNombre(categoriaNombre.trim())
+            CategoriaDTO categoria = categoriaService.buscarPorNombre(categoriaNombre.trim())
                     .orElseGet(() -> {
                         CategoriaCreateDTO newCat = CategoriaCreateDTO.builder()
                                 .nombre(categoriaNombre.trim())
                                 .build();
-                        return categoriaService.create(newCat);
+                        return categoriaService.crear(newCat);
                     });
             
             // Crear DTO del producto
@@ -207,11 +207,11 @@ public class ProductoAdminController {
             
             // Guardar o actualizar
             if (id == null) {
-                productoService.create(productoDTO, imagen);
+                productoService.crear(productoDTO, imagen);
                 log.info("Producto creado exitosamente");
                 redirectAttributes.addFlashAttribute("mensaje", "Producto creado correctamente");
             } else {
-                productoService.update(id, productoDTO, imagen);
+                productoService.actualizar(id, productoDTO, imagen);
                 log.info("Producto actualizado exitosamente");
                 redirectAttributes.addFlashAttribute("mensaje", "Producto actualizado correctamente");
             }
@@ -241,7 +241,7 @@ public class ProductoAdminController {
             @RequestParam("stockAAgregar") Integer stockAAgregar,
             RedirectAttributes redirectAttributes) {
         try {
-            ProductoDTO producto = productoService.findById(id)
+            ProductoDTO producto = productoService.buscarPorId(id)
                     .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
             
             productoService.aumentarStock(id, stockAAgregar);
@@ -267,7 +267,7 @@ public class ProductoAdminController {
     @ResponseBody
     public ResponseEntity<?> cambiarEstado(@PathVariable Integer id) {
         try {
-            ProductoDTO producto = productoService.findById(id)
+            ProductoDTO producto = productoService.buscarPorId(id)
                     .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
             
             Boolean nuevoEstado = !producto.getEstado();
@@ -297,7 +297,7 @@ public class ProductoAdminController {
     @PreAuthorize("hasAnyAuthority('PRODUCTOS_ELIMINAR', 'PRODUCTOS_GESTIONAR', 'ROLE_ADMINISTRADOR')")
     public String desactivarProducto(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
-            productoService.deleteById(id);
+            productoService.eliminarPorId(id);
             
             log.info("Producto desactivado: ID={}", id);
             redirectAttributes.addFlashAttribute("mensaje", "Producto desactivado correctamente");
@@ -341,7 +341,7 @@ public class ProductoAdminController {
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
     public String eliminarPermanente(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
-            productoService.deletePermanently(id);
+            productoService.eliminarPermanentemente(id);
             
             log.warn("Producto eliminado permanentemente: ID={}", id);
             redirectAttributes.addFlashAttribute("mensaje", "Producto eliminado permanentemente");

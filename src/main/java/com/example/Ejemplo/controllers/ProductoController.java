@@ -71,7 +71,7 @@ public class ProductoController {
                 return p;
             });
         } else {
-            productosPage = productosServiceImpl.findAllPaginado(pageable).map(dto -> {
+            productosPage = productosServiceImpl.obtenerTodosPaginado(pageable).map(dto -> {
                 Producto p = new Producto();
                 p.setIdProducto(dto.getIdProducto());
                 p.setNombre(dto.getNombre());
@@ -109,7 +109,7 @@ public class ProductoController {
         int idUsuario = usuario.getIdUsuario();
         int nuevaCantidad = 0;
         double nuevoTotal = 0;
-        Producto producto = productosServiceImpl.findById(idProducto).map(dto -> {
+        Producto producto = productosServiceImpl.buscarPorId(idProducto).map(dto -> {
             Producto p = new Producto();
             p.setIdProducto(dto.getIdProducto());
             p.setNombre(dto.getNombre());
