@@ -66,21 +66,179 @@
     <!-- Modal lateral derecho de notificaciones -->
     <div id="notification-modal" class="notification-modal hidden" onclick="closeNotifications(event)">
         <div class="notification-content" onclick="event.stopPropagation()">
-            <div class="notification-header">
+            <div class="notification-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Notificaciones</h5>
-                <span onclick="closeNotifications(event)" style="cursor: pointer;">&times;</span>
+                <div class="d-flex gap-2 align-items-center">
+                    <!-- Botón para limpiar todas -->
+                    <button th:if="${notificaciones != null && !notificaciones.isEmpty()}" 
+                            type="button"
+                            id="btnLimpiarTodas"
+                            class="btn btn-sm btn-outline-danger" 
+                            title="Limpiar todas"
+                            onclick="confirmarLimpiarNotificaciones();">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    <span onclick="closeNotifications(event)" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+                </div>
             </div>
-            <div class="notification-body" th:each="notificacion : ${notificaciones}">
-                <div class="d-flex align-items-start p-3 mb-2 rounded shadow-sm"
+            
+            <!-- Mensaje si no hay notificaciones -->
+            <div th:if="${notificaciones == null || notificaciones.isEmpty()}" 
+                 class="notification-body text-center p-4">
+                <i class="bi bi-bell-slash fs-1 text-muted"></i>
+                <p class="text-muted mt-2">No tienes notificaciones</p>
+            </div>
+            
+            <!-- Lista de notificaciones (máximo 10 más recientes) -->
+            <div th:if="${notificaciones != null && !notificaciones.isEmpty()}" class="notification-body">
+                <div th:each="notificacion, iterStat : ${notificaciones}" 
+                     th:if="${iterStat.index < 10}"
+                     class="d-flex align-items-start p-3 mb-2 rounded shadow-sm position-relative"
                      th:classappend="${notificacion.estado} ? 'bg-light' : 'bg-warning-subtle border-start border-5 border-warning'">
                     <i class="bi bi-bell-fill me-3 fs-4 text-warning"></i>
-                    <div>
+                    <div class="flex-grow-1">
                         <p class="mb-1 fw-semibold" th:text="${notificacion.mensaje}">Mensaje</p>
                     </div>
+                    <!-- Botón para eliminar individual -->
+                    <button type="button" 
+                            class="btn btn-sm btn-link text-danger p-0 ms-2 btn-eliminar-notif" 
+                            th:data-id="${notificacion.idNotificacion}"
+                            title="Eliminar"
+                            style="font-size: 0.9rem;">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                </div>
+                
+                <!-- Mensaje si hay más de 10 notificaciones -->
+                <div th:if="${notificaciones.size() > 10}" 
+                     class="text-center p-2 text-muted small">
+                    <i class="bi bi-info-circle"></i>
+                    Mostrando las últimas 10 de <span th:text="${notificaciones.size()}">0</span> notificaciones
                 </div>
             </div>
         </div>
     </div>
+    
+    <script>
+        // Obtener el token CSRF
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+        
+        // Eliminar notificación individual con AJAX
+        document.addEventListener('DOMContentLoaded', function() {
+            // Eliminar notificación individual
+            document.querySelectorAll('.btn-eliminar-notif').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const idNotificacion = this.getAttribute('data-id');
+                    const notifElement = this.closest('.d-flex');
+                    
+                    const headers = {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    };
+                    if (csrfToken && csrfHeader) {
+                        headers[csrfHeader] = csrfToken;
+                    }
+                    
+                    fetch('/notificacion/eliminar', {
+                        method: 'POST',
+                        headers: headers,
+                        body: 'idNotificacion=' + idNotificacion
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Eliminar visualmente
+                            notifElement.style.transition = 'opacity 0.3s';
+                            notifElement.style.opacity = '0';
+                            setTimeout(() => {
+                                notifElement.remove();
+                                
+                                // Actualizar contador
+                                const badge = document.querySelector('.notification-badge');
+                                if (badge) {
+                                    const count = parseInt(badge.textContent) - 1;
+                                    if (count > 0) {
+                                        badge.textContent = count;
+                                    } else {
+                                        badge.remove();
+                                        // Mostrar mensaje de "no hay notificaciones"
+                                        const notifBody = document.querySelector('.notification-body');
+                                        if (notifBody && notifBody.children.length === 0) {
+                                            location.reload();
+                                        }
+                                    }
+                                }
+                            }, 300);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        });
+        
+        // Confirmación para limpiar todas las notificaciones con SweetAlert2
+        function confirmarLimpiarNotificaciones() {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: '¿Eliminar todas las notificaciones?',
+                    text: 'Esta acción no se puede deshacer',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, eliminar todas',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const headers = {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        };
+                        if (csrfToken && csrfHeader) {
+                            headers[csrfHeader] = csrfToken;
+                        }
+                        
+                        // Eliminar todas con AJAX
+                        fetch('/notificacion/eliminar-todas', {
+                            method: 'POST',
+                            headers: headers
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                // Recargar la página para actualizar todo
+                                location.reload();
+                            } else {
+                                Swal.fire('Error', 'No se pudieron eliminar las notificaciones', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire('Error', 'Error de conexión', 'error');
+                        });
+                    }
+                });
+            } else {
+                // Fallback si SweetAlert2 no está disponible
+                if (confirm('¿Eliminar todas las notificaciones?')) {
+                    const headers = {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    };
+                    if (csrfToken && csrfHeader) {
+                        headers[csrfHeader] = csrfToken;
+                    }
+                    
+                    fetch('/notificacion/eliminar-todas', {
+                        method: 'POST',
+                        headers: headers
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    });
+                }
+            }
+        }
+    </script>
 
 </header>
 </body>
