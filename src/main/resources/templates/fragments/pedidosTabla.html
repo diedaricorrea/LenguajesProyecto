@@ -69,8 +69,11 @@
                     <div class="d-grid gap-2">
                         <form th:action="@{/admin/pedidos/{id}/avanzar(id=${pedido.idPedido})}" 
                               method="post"
-                              onsubmit="return confirm('¿Avanzar este pedido?')"
-                              th:if="${pedido.siguienteEstado != null}">
+                              class="form-avanzar-pedido"
+                              th:attr="data-siguiente-estado=${pedido.siguienteEstado != null ? pedido.siguienteEstado.displayName : ''}"
+                              th:if="${pedido.siguienteEstado != null}"
+                              onsubmit="return confirmarAvanzarPedido(this, this.getAttribute('data-siguiente-estado'));">
+                            <input type="hidden" name="fromTab" class="current-tab-input">
                             <button type="submit" class="btn btn-primary w-100">
                                 <i class="bi bi-arrow-right-circle"></i>
                                 <span th:text="'Marcar como ' + ${pedido.siguienteEstado.displayName}">Avanzar</span>
@@ -107,6 +110,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <form th:action="@{/admin/pedidos/{id}/cancelar(id=${pedido.idPedido})}" method="post">
+                    <input type="hidden" name="fromTab" class="current-tab-input">
                     <div class="modal-body">
                         <p>¿Estás seguro de cancelar este pedido?</p>
                         <div class="mb-3">

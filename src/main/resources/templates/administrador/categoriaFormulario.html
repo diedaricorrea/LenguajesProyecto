@@ -143,6 +143,10 @@
             integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
             crossorigin="anonymous"></script>
     
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/js/sweetalert-utils.js}"></script>
+    
     <script>
         // Validacion del formulario
         document.getElementById('categoriaForm').addEventListener('submit', function(e) {
@@ -150,13 +154,13 @@
             
             if (nombre.length < 2) {
                 e.preventDefault();
-                alert('El nombre debe tener al menos 2 caracteres');
+                mostrarError('El nombre debe tener al menos 2 caracteres');
                 return false;
             }
             
             if (nombre.length > 100) {
                 e.preventDefault();
-                alert('El nombre no puede exceder 100 caracteres');
+                mostrarError('El nombre no puede exceder 100 caracteres');
                 return false;
             }
         });

@@ -28,11 +28,7 @@
         <h1>Gestion de Usuarios</h1>
         <div>
             <h2>Acciones</h2>
-            <!-- Contenedor de los errores -->
-            <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" id="mensaje-alerta" role="alert">
-                <span th:text="${mensaje}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            <!-- Mensaje con SweetAlert2 se muestra via script al final -->
             <!-- Barra de acciones-->
             <div class="container p-6  d-flex gap-3">
                 <!-- Modal de agregar-->
@@ -195,15 +191,26 @@
             modal.show();
         });
     </script>
-    <script th:if="${mensaje}">
-        document.addEventListener("DOMContentLoaded", function () {
-            const alerta = document.getElementById('mensaje-alerta');
-            setTimeout(() => {
-                // Usa Bootstrap para cerrar con animación
-                const bsAlert = bootstrap.Alert.getOrCreateInstance(alerta);
-                bsAlert.close();
-            }, 1500); // 1 segundos
-        });
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script th:inline="javascript">
+        // Mostrar mensaje con SweetAlert2 si existe
+        /*<![CDATA[*/
+        const mensaje = /*[[${mensaje}]]*/ null;
+        
+        if (mensaje) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: mensaje,
+                confirmButtonColor: '#0d6efd',
+                timer: 3000,
+                timerProgressBar: true
+            });
+        }
+        /*]]>*/
     </script>
 </body>
 </html>

@@ -35,14 +35,7 @@
                 </div>
             </div>
 
-            <!-- Mensajes de alerta -->
-            <div th:if="${mensaje}" 
-                 th:class="'alert alert-' + ${tipoMensaje} + ' alert-dismissible fade show'" 
-                 role="alert">
-                <i th:class="${tipoMensaje == 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-triangle-fill'}"></i>
-                <span th:text="${mensaje}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+            <!-- Mensaje con SweetAlert2 se muestra via script al final -->
 
             <!-- Filtros y busqueda -->
             <div class="card mb-4">
@@ -169,7 +162,7 @@
                                                 <button type="submit" 
                                                         class="btn btn-outline-warning"
                                                         title="Desactivar producto"
-                                                        onclick="return confirm('Desactivar este producto?')">
+                                                        onclick="return confirmarDesactivarProducto(this.form);">
                                                     <i class="bi bi-toggle-off"></i>
                                                 </button>
                                             </form>
@@ -240,17 +233,28 @@
             integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
             crossorigin="anonymous"></script>
     
-    <script>
-        // Auto-cerrar alertas despues de 5 segundos
-        document.addEventListener('DOMContentLoaded', function() {
-            const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
-            alerts.forEach(alert => {
-                setTimeout(() => {
-                    const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-                    bsAlert.close();
-                }, 5000);
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/js/sweetalert-utils.js}"></script>
+    
+    <script th:inline="javascript">
+        // Mostrar mensaje con SweetAlert2 si existe
+        /*<![CDATA[*/
+        const mensaje = /*[[${mensaje}]]*/ null;
+        const tipoMensaje = /*[[${tipoMensaje}]]*/ 'info';
+        
+        if (mensaje) {
+            const icon = tipoMensaje === 'success' ? 'success' : (tipoMensaje === 'danger' ? 'error' : (tipoMensaje === 'warning' ? 'warning' : 'info'));
+            Swal.fire({
+                icon: icon,
+                title: tipoMensaje === 'success' ? 'Éxito' : (tipoMensaje === 'danger' ? 'Error' : 'Información'),
+                text: mensaje,
+                confirmButtonColor: '#0d6efd',
+                timer: tipoMensaje === 'success' ? 3000 : undefined,
+                timerProgressBar: tipoMensaje === 'success'
             });
-        });
+        }
+        /*]]>*/
     </script>
 </body>
 </html>

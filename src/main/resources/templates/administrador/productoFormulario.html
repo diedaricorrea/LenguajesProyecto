@@ -297,6 +297,10 @@
             integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
             crossorigin="anonymous"></script>
     
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/js/sweetalert-utils.js}"></script>
+    
     <script>
         // Actualizar vista previa en tiempo real
         function actualizarVista() {
@@ -327,13 +331,13 @@
             
             if (precio <= 0) {
                 e.preventDefault();
-                alert('El precio debe ser mayor a 0');
+                mostrarError('El precio debe ser mayor a 0');
                 return false;
             }
             
             if (stock < 0) {
                 e.preventDefault();
-                alert('El stock no puede ser negativo');
+                mostrarError('El stock no puede ser negativo');
                 return false;
             }
         });
@@ -427,7 +431,7 @@
             
             // 2. VALIDACIÓN CLIENTE (antes de enviar al servidor)
             if (!nombre) {
-                alert('El nombre de la categoria es obligatorio');
+                mostrarError('El nombre de la categoria es obligatorio');
                 return; // Detener ejecución si no hay nombre
             }
             
@@ -487,14 +491,14 @@
                     setTimeout(() => alertDiv.remove(), 3000); // Auto-eliminar en 3 segundos
                 } else {
                     // Si el servidor respondió con error (400, 500, etc.)
-                    alert('Error al crear la categoria. Intenta de nuevo.');
+                    mostrarError('Error al crear la categoria. Intenta de nuevo.');
                 }
             })
             // 9. MANEJAR ERRORES DE RED
             //    Si no hay conexión, el servidor no responde, etc.
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error al crear la categoria. Verifica tu conexion.');
+                mostrarError('Error al crear la categoria. Verifica tu conexion.');
             })
             // 10. FINALLY - Se ejecuta siempre (éxito o error)
             //     Rehabilitar el botón para permitir intentos nuevos

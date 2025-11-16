@@ -118,6 +118,7 @@ public class PedidoAdminController {
     @PostMapping("/{id}/avanzar")
     public String avanzarEstado(
             @PathVariable Integer id,
+            @RequestParam(required = false) String fromTab,
             RedirectAttributes redirectAttributes) {
         try {
             // Obtener el usuario del pedido para notificarle
@@ -127,14 +128,16 @@ public class PedidoAdminController {
             Integer idUsuario = pedido.getUsuario() != null ? pedido.getUsuario().getIdUsuario() : null;
             
             // Delegar la lógica al service
-            if (pedidosService.avanzarEstadoPedido(id, idUsuario)) {
-                redirectAttributes.addFlashAttribute("mensaje", 
-                    "Pedido actualizado exitosamente");
-                redirectAttributes.addFlashAttribute("tipoMensaje", "success");
-            } else {
+            if (!pedidosService.avanzarEstadoPedido(id, idUsuario)) {
                 redirectAttributes.addFlashAttribute("mensaje", 
                     "No se puede avanzar el estado del pedido");
                 redirectAttributes.addFlashAttribute("tipoMensaje", "warning");
+            }
+            // No mostramos mensaje de éxito para no duplicar con la confirmación
+            
+            // Recordar el tab desde donde se hizo la acción
+            if (fromTab != null) {
+                redirectAttributes.addFlashAttribute("activeTab", fromTab);
             }
             
         } catch (Exception e) {
@@ -155,6 +158,7 @@ public class PedidoAdminController {
     public String cancelarPedido(
             @PathVariable Integer id,
             @RequestParam(required = false) String motivo,
+            @RequestParam(required = false) String fromTab,
             RedirectAttributes redirectAttributes) {
         try {
             // Obtener el usuario del pedido para notificarle
@@ -172,6 +176,11 @@ public class PedidoAdminController {
                 redirectAttributes.addFlashAttribute("mensaje", 
                     "No se puede cancelar el pedido en su estado actual");
                 redirectAttributes.addFlashAttribute("tipoMensaje", "warning");
+            }
+            
+            // Recordar el tab desde donde se hizo la acción
+            if (fromTab != null) {
+                redirectAttributes.addFlashAttribute("activeTab", fromTab);
             }
             
         } catch (Exception e) {

@@ -53,12 +53,7 @@
                 </div>
             </div>
 
-            <!-- Alertas -->
-            <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje ?: 'info'} + ' alert-dismissible fade show'" role="alert">
-                <i th:class="'bi ' + ${tipoMensaje == 'success' ? 'bi-check-circle' : 'bi-info-circle'}"></i>
-                <span th:text="${mensaje}">Mensaje</span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+            <!-- Mensaje con SweetAlert2 se muestra via script al final -->
 
             <!-- Tabs de Estados -->
             <ul class="nav nav-tabs mb-4" id="pedidosTabs" role="tablist">
@@ -134,7 +129,61 @@
             integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
             crossorigin="anonymous"></script>
     
-    <script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/js/sweetalert-utils.js}"></script>
+    
+    <script th:inline="javascript">
+        // Mostrar mensaje con SweetAlert2 si existe
+        /*<![CDATA[*/
+        const mensaje = /*[[${mensaje}]]*/ null;
+        const tipoMensaje = /*[[${tipoMensaje}]]*/ 'info';
+        const activeTab = /*[[${activeTab}]]*/ null;
+        
+        if (mensaje) {
+            const icon = tipoMensaje === 'success' ? 'success' : (tipoMensaje === 'danger' ? 'error' : (tipoMensaje === 'warning' ? 'warning' : 'info'));
+            Swal.fire({
+                icon: icon,
+                title: tipoMensaje === 'success' ? 'Éxito' : (tipoMensaje === 'danger' ? 'Error' : 'Información'),
+                text: mensaje,
+                confirmButtonColor: '#0d6efd',
+                timer: tipoMensaje === 'success' ? 3000 : undefined,
+                timerProgressBar: tipoMensaje === 'success'
+            });
+        }
+        /*]]>*/
+        
+        // Restaurar el tab activo si existe
+        document.addEventListener('DOMContentLoaded', function() {
+            if (activeTab) {
+                const tabButton = document.getElementById(activeTab + '-tab');
+                if (tabButton) {
+                    const tab = new bootstrap.Tab(tabButton);
+                    tab.show();
+                }
+            }
+            
+            // Capturar el tab actual en todos los formularios
+            document.querySelectorAll('.nav-tabs .nav-link').forEach(function(tabLink) {
+                tabLink.addEventListener('shown.bs.tab', function(e) {
+                    const currentTabId = e.target.id.replace('-tab', '');
+                    // Actualizar todos los inputs hidden con el tab actual
+                    document.querySelectorAll('.current-tab-input').forEach(function(input) {
+                        input.value = currentTabId;
+                    });
+                });
+            });
+            
+            // Inicializar el valor del tab actual al cargar
+            const activeTabButton = document.querySelector('.nav-tabs .nav-link.active');
+            if (activeTabButton) {
+                const currentTabId = activeTabButton.id.replace('-tab', '');
+                document.querySelectorAll('.current-tab-input').forEach(function(input) {
+                    input.value = currentTabId;
+                });
+            }
+        });
+        
         // Auto-actualizar cada 30 segundos
         setInterval(function() {
             location.reload();
