@@ -35,8 +35,8 @@ public class NotificacionController {
         //envio de notificacion al usuario
         notificacionServiceImpl.sendNotificacion(idUsuario, message);
         //eliminacion del pedido de la lista de pendientes del usuario
-        pedidosServiceImpl.deletePedido(codigoPedido);
-        return "redirect:/pedidos/admin";
+        pedidosServiceImpl.eliminarPedido(codigoPedido);
+        return "redirect:/admin/pedidos";
     }
 
 }

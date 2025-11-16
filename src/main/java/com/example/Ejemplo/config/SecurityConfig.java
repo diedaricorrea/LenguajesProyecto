@@ -41,6 +41,7 @@ public class SecurityConfig {
                     .requestMatchers("/categorias", "/categorias/**").hasAnyAuthority("CATEGORIAS_VER", "ROLE_ADMINISTRADOR", "ROLE_TRABAJADOR")
                     
                     // Pedidos - Usuario puede crear, Admin/Trabajador pueden gestionar
+                    .requestMatchers("/admin/pedidos", "/admin/pedidos/**").hasAnyAuthority("PEDIDOS_GESTIONAR", "ROLE_ADMINISTRADOR", "ROLE_TRABAJADOR")
                     .requestMatchers("/pedidos/pedir").hasAnyAuthority("PEDIDOS_CREAR", "ROLE_ADMINISTRADOR", "ROLE_USUARIO", "ROLE_TRABAJADOR")
                     .requestMatchers("/pedidos/**").hasAnyAuthority("PEDIDOS_VER", "PEDIDOS_GESTIONAR", "ROLE_ADMINISTRADOR", "ROLE_USUARIO", "ROLE_TRABAJADOR")
                     .requestMatchers("/pedidos").hasAnyAuthority("PEDIDOS_VER", "ROLE_ADMINISTRADOR", "ROLE_USUARIO", "ROLE_TRABAJADOR")

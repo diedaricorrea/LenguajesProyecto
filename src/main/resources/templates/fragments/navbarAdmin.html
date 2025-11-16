@@ -19,12 +19,8 @@
                         class="bi bi-folder"></i>Gestion de Categorias</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'pendientes' ? 'active' : ''}" th:href="@{/pedidos/admin}"><i
-                        class="fas fa-list me-2"></i>Pedidos</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'enviados' ? 'active' : ''}" th:href="@{/pedidos/enviados}"><i
-                        class="fas fa-list me-2"></i>Pedidos Enviados</a>
+                <a class="nav-link" th:classappend="${activeTab == 'pedidos' ? 'active' : ''}" th:href="@{/admin/pedidos}"><i
+                        class="bi bi-receipt"></i>Gestión de Pedidos</a>
             </li>
             <li class="nav-item" th:if="${usuarioAdmins == 'ADMINISTRADOR'}">
                 <a class="nav-link" th:classappend="${activeTab == 'usuarios' ? 'active' : ''}" th:href="@{/usuarios/panelAdmin}"><i

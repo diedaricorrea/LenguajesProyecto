@@ -6,5 +6,8 @@ import java.util.List;
 
 public interface NotificacionService {
     void sendNotificacion(int idUsuario, String mensaje);
+    
+    void crearNotificacion(int idUsuario, String mensaje);
+    
     List<Notificacion> findAllByUsuario_IdUsuario(int idUsuario);
 }

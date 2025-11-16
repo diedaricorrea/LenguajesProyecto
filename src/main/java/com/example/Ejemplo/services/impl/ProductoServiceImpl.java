@@ -1,6 +1,7 @@
 package com.example.Ejemplo.services.impl;
 
 import com.example.Ejemplo.dto.*;
+import com.example.Ejemplo.mapper.ProductoMapper;
 import com.example.Ejemplo.models.Categoria;
 import com.example.Ejemplo.models.Producto;
 import com.example.Ejemplo.repository.CategoriaRepository;

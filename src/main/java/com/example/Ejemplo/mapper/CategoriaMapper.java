@@ -1,5 +1,8 @@
-package com.example.Ejemplo.dto;
+package com.example.Ejemplo.mapper;
 
+import com.example.Ejemplo.dto.CategoriaCreateDTO;
+import com.example.Ejemplo.dto.CategoriaDTO;
+import com.example.Ejemplo.dto.CategoriaResponseDTO;
 import com.example.Ejemplo.models.Categoria;
 import org.springframework.stereotype.Component;
 

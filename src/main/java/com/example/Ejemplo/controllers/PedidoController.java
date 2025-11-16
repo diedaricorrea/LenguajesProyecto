@@ -1,9 +1,10 @@
 package com.example.Ejemplo.controllers;
 
 import com.example.Ejemplo.config.UsuarioDetails;
+import com.example.Ejemplo.dto.PedidoDTO;
 import com.example.Ejemplo.models.*;
-import com.example.Ejemplo.services.impl.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.Ejemplo.services.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -14,64 +15,83 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador para la gestión de pedidos del usuario
+ * Permite a los usuarios ver sus pedidos y crear nuevos desde el carrito
+ */
+@Slf4j
 @Controller
 @RequestMapping("/pedidos")
 public class PedidoController {
-    private final PedidosServiceImpl pedidoServiceImpl;
-    private final UsuarioServiceImpl usuarioServiceImpl;
-    private final CarritoServiceImpl carritoServiceImpl;
-    private final DetallePedidoServiceImpl detallePedidoServiceImpl;
-    private final ProductoServiceImpl productoServiceImpl;
-    private final NotificacionServiceImpl notificacionServiceImpl;
+    private final PedidosService pedidosService;
+    private final UsuarioService usuarioService;
+    private final CarritoService carritoService;
+    private final DetallePedidoService detallePedidoService;
+    private final ProductoService productoService;
+    private final NotificacionService notificacionService;
 
-    @Autowired
-    public PedidoController(PedidosServiceImpl pedidoServiceImpl, UsuarioServiceImpl usuarioServiceImpl, CarritoServiceImpl carritoServiceImpl, DetallePedidoServiceImpl detallePedidoServiceImpl, ProductoServiceImpl productoServiceImpl, NotificacionServiceImpl notificacionServiceImpl) {
-        this.pedidoServiceImpl = pedidoServiceImpl;
-        this.usuarioServiceImpl = usuarioServiceImpl;
-        this.carritoServiceImpl = carritoServiceImpl;
-        this.detallePedidoServiceImpl = detallePedidoServiceImpl;
-        this.productoServiceImpl = productoServiceImpl;
-        this.notificacionServiceImpl = notificacionServiceImpl;
+    public PedidoController(PedidosService pedidosService, 
+                           UsuarioService usuarioService,
+                           CarritoService carritoService, 
+                           DetallePedidoService detallePedidoService,
+                           ProductoService productoService, 
+                           NotificacionService notificacionService) {
+        this.pedidosService = pedidosService;
+        this.usuarioService = usuarioService;
+        this.carritoService = carritoService;
+        this.detallePedidoService = detallePedidoService;
+        this.productoService = productoService;
+        this.notificacionService = notificacionService;
     }
 
+    /**
+     * Muestra todos los pedidos del usuario actual
+     * GET /pedidos
+     */
     @GetMapping()
     public String verPedidos(@AuthenticationPrincipal UsuarioDetails userDetails, Model model) {
-        Usuario usuario = userDetails.getUsuario();
-        int idUsuario = usuario.getIdUsuario();
-        model.addAttribute("usuarioAdmins", usuario.getRol().toString());
-        model.addAttribute("pedidos", pedidoServiceImpl.findByUsuario_Id(idUsuario));
-        model.addAttribute("notificaciones",notificacionServiceImpl.findAllByUsuario_IdUsuario(idUsuario));
-        model.addAttribute("pedidosDetalle", pedidoServiceImpl.obtenerDetallePedidosPorId(idUsuario));
-        return "usuario/pedido";
+        try {
+            Usuario usuario = userDetails.getUsuario();
+            int idUsuario = usuario.getIdUsuario();
+            
+            // Obtener pedidos y convertir a DTOs
+            List<Pedido> pedidos = pedidosService.obtenerPedidosPorUsuario(idUsuario);
+            List<PedidoDTO> pedidosDTO = pedidosService.convertirPedidosADTO(pedidos);
+            
+            // Separar pedidos activos y completados
+            List<PedidoDTO> pedidosActivos = pedidosDTO.stream()
+                    .filter(p -> !p.getEstado().esFinal())
+                    .collect(Collectors.toList());
+            
+            List<PedidoDTO> pedidosCompletados = pedidosDTO.stream()
+                    .filter(p -> p.getEstado().esFinal())
+                    .collect(Collectors.toList());
+            
+            model.addAttribute("usuarioAdmins", usuario.getRol().toString());
+            model.addAttribute("pedidosActivos", pedidosActivos);
+            model.addAttribute("pedidosCompletados", pedidosCompletados);
+            model.addAttribute("notificaciones", notificacionService.findAllByUsuario_IdUsuario(idUsuario));
+            
+            log.debug("Mostrando pedidos del usuario {}: {} activos, {} completados", 
+                     idUsuario, pedidosActivos.size(), pedidosCompletados.size());
+            
+            return "usuario/pedido";
+            
+        } catch (Exception e) {
+            log.error("Error al cargar pedidos del usuario", e);
+            model.addAttribute("error", "Error al cargar tus pedidos: " + e.getMessage());
+            return "error/error";
+        }
     }
 
-    @GetMapping("/admin")
-    public String verPedidosPendientes(Model model, @AuthenticationPrincipal UsuarioDetails userDetails) {
-        Usuario usuario = userDetails.getUsuario();
-
-        model.addAttribute("usuarioAdmins", usuario.getRol().toString());
-        model.addAttribute("pedidosPendientes", pedidoServiceImpl.obtenerDetallePedidos());
-        return "administrador/pendientes";
-    }
-
-    @GetMapping("/enviados")
-    public String verPedidosEnviados(Model model, @AuthenticationPrincipal UsuarioDetails userDetails) {
-        Usuario usuario = userDetails.getUsuario();
-        model.addAttribute("usuarioAdmins", usuario.getRol().toString());
-        model.addAttribute("pedidosEnviados", pedidoServiceImpl.obtenerDetallePedidosEnviados());
-        return "administrador/pedidosEnviados";
-    }
-
-    @PostMapping("/buscar")
-    public String buscarPedido(Model model, @AuthenticationPrincipal UsuarioDetails userDetails, @RequestParam("codigo") String codigo) {
-        Usuario usuario = userDetails.getUsuario();
-        model.addAttribute("usuarioAdmins", usuario.getRol().toString());
-        model.addAttribute("pedidosEnviados", pedidoServiceImpl.buscarPorCodigoPedido(codigo.toUpperCase()));
-        return "administrador/pedidosEnviados";
-    }
-
+    /**
+     * Crea un nuevo pedido desde el carrito
+     * POST /pedidos/pedir
+     */
     @PostMapping("/pedir")
-    public String pedir(@AuthenticationPrincipal UsuarioDetails userDetails, @RequestParam("horaEntrega") LocalTime horaEntrega, Model model) {
+    public String pedir(@AuthenticationPrincipal UsuarioDetails userDetails, 
+                       @RequestParam("horaEntrega") LocalTime horaEntrega, 
+                       Model model) {
         try {
             // 1. Validar usuario
             Usuario usuario = userDetails.getUsuario();
@@ -81,57 +101,102 @@ public class PedidoController {
 
             int idUsuario = usuario.getIdUsuario();
 
-            // 2. Obtener listas una sola vez
+            // 2. Obtener productos del carrito
             List<Producto> productos = obtenerTodosProductos(idUsuario);
             List<Integer> cantidades = obtenerTodosProductosConCantidad(idUsuario);
 
-            // 3. Validar que coincidan los tamaños
+            // 3. Validar que haya productos en el carrito
+            if (productos.isEmpty()) {
+                model.addAttribute("error", "El carrito está vacío");
+                return "redirect:/carrito";
+            }
+
+            // 4. Validar que coincidan los tamaños
             if (productos.size() != cantidades.size()) {
                 throw new IllegalStateException("Los productos y sus cantidades no coinciden");
             }
 
-            // 4. Crear pedido
+            // 5. Crear pedido con estado inicial PENDIENTE
             Pedido pedido = new Pedido();
-            pedido.setUsuario(usuarioServiceImpl.findUsuarioById(idUsuario).orElseThrow());
+            pedido.setUsuario(usuarioService.findUsuarioById(idUsuario)
+                    .orElseThrow(() -> new IllegalStateException("Usuario no encontrado")));
             pedido.setFechaEntrega(horaEntrega);
-            pedido.setCodigoPedido(pedidoServiceImpl.generarCodigoUnico());
-            Pedido pedidoGuardado = pedidoServiceImpl.guardarPedido(pedido);
+            pedido.setCodigoPedido(pedidosService.generarCodigoUnico());
+            pedido.setEstado(EstadoPedido.PENDIENTE); // Estado inicial
+            
+            Pedido pedidoGuardado = pedidosService.guardarPedido(pedido);
 
-            // 5. Procesar productos
+            // 6. Procesar detalles del pedido
             for (int i = 0; i < productos.size(); i++) {
-                Producto pro = productos.get(i);
-                int cantidad = cantidades.get(i); // Ahora sí accedes al índice correcto
+                Producto producto = productos.get(i);
+                int cantidad = cantidades.get(i);
+                
+                // Validar stock disponible
+                if (producto.getStock() < cantidad) {
+                    throw new IllegalStateException(
+                        String.format("Stock insuficiente para %s. Disponible: %d, Solicitado: %d", 
+                                     producto.getNombre(), producto.getStock(), cantidad)
+                    );
+                }
+                
                 DetallePedido detallePedido = new DetallePedido();
                 detallePedido.setPedido(pedidoGuardado);
-                detallePedido.setProducto(pro);
+                detallePedido.setProducto(producto);
                 detallePedido.setCantidad(cantidad);
-                detallePedido.setSubtotal(pro.getPrecio() * cantidad);
+                detallePedido.setSubtotal(producto.getPrecio() * cantidad);
 
                 DetallePedidoId detalleId = new DetallePedidoId(
                         pedidoGuardado.getIdPedido(),
-                        pro.getIdProducto()
+                        producto.getIdProducto()
                 );
                 detallePedido.setDetallepedidoId(detalleId);
 
-                productoServiceImpl.reducirStock(pro.getIdProducto(), cantidad);
-                detallePedidoServiceImpl.saveDetallePedido(detallePedido);
+                // Reducir stock
+                productoService.reducirStock(producto.getIdProducto(), cantidad);
+                detallePedidoService.saveDetallePedido(detallePedido);
             }
 
-            carritoServiceImpl.limpiarCarrito(idUsuario);
+            // 7. Limpiar carrito
+            carritoService.limpiarCarrito(idUsuario);
+            
+            // 8. Crear notificación de confirmación
+            notificacionService.crearNotificacion(
+                idUsuario,
+                String.format("¡Pedido %s creado exitosamente! Te notificaremos cuando esté listo.", 
+                            pedidoGuardado.getCodigoPedido())
+            );
+            
+            log.info("Pedido {} creado exitosamente para usuario {}", 
+                    pedidoGuardado.getCodigoPedido(), idUsuario);
+            
             return "redirect:/pedidos";
 
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
+            log.error("Error de validación al crear pedido", e);
             model.addAttribute("error", e.getMessage());
-            return "error";
+            return "redirect:/carrito?error=" + e.getMessage();
+        } catch (Exception e) {
+            log.error("Error al crear pedido", e);
+            model.addAttribute("error", "Error al procesar tu pedido: " + e.getMessage());
+            return "error/error";
         }
     }
 
-
-    List<Producto> obtenerTodosProductos(int idUsuario){
-        return carritoServiceImpl.obtenerCarritosPorUsuario(idUsuario).stream().map(carrito -> carrito.getIdProducto()).collect(Collectors.toList());
+    /**
+     * Obtiene todos los productos del carrito del usuario
+     */
+    private List<Producto> obtenerTodosProductos(int idUsuario) {
+        return carritoService.obtenerCarritosPorUsuario(idUsuario).stream()
+                .map(Carrito::getIdProducto)
+                .collect(Collectors.toList());
     }
-    List<Integer> obtenerTodosProductosConCantidad(int idUsuario){
-        return carritoServiceImpl.obtenerCarritosPorUsuario(idUsuario).stream().map(carrito -> carrito.getCantidad()).collect(Collectors.toList());
-    }
 
+    /**
+     * Obtiene las cantidades de todos los productos del carrito
+     */
+    private List<Integer> obtenerTodosProductosConCantidad(int idUsuario) {
+        return carritoService.obtenerCarritosPorUsuario(idUsuario).stream()
+                .map(Carrito::getCantidad)
+                .collect(Collectors.toList());
+    }
 }

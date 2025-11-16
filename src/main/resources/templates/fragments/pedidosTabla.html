@@ -1,0 +1,133 @@
+<!-- fragments/pedidosTabla.html -->
+<div th:fragment="tablaFragment(pedidos, mostrarAccion, accionTexto)" xmlns:th="http://www.thymeleaf.org">
+    <div th:if="${pedidos == null || pedidos.isEmpty()}" class="alert alert-info text-center">
+        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+        <p class="mb-0">No hay pedidos en este estado</p>
+    </div>
+
+    <div th:unless="${pedidos == null || pedidos.isEmpty()}" class="row g-3">
+        <div th:each="pedido : ${pedidos}" class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <!-- Header con código y estado -->
+                <div class="card-header d-flex justify-content-between align-items-center"
+                     th:classappend="'bg-' + ${pedido.estadoBootstrapClass} + ' bg-opacity-10'">
+                    <div>
+                        <h5 class="mb-0 fw-bold" th:text="${pedido.codigoPedido}">ABC123</h5>
+                        <small class="text-muted" th:text="${pedido.nombreUsuario}">Usuario</small>
+                    </div>
+                    <span class="badge" 
+                          th:classappend="'bg-' + ${pedido.estadoBootstrapClass}"
+                          th:text="${pedido.estadoDisplayName}">
+                        Estado
+                    </span>
+                </div>
+
+                <!-- Body con detalles -->
+                <div class="card-body">
+                    <!-- Hora de entrega -->
+                    <div class="mb-3">
+                        <i class="bi bi-clock text-primary"></i>
+                        <small class="text-muted">Hora de entrega:</small>
+                        <strong th:text="${#temporals.format(pedido.fechaEntrega, 'HH:mm')}">12:00</strong>
+                    </div>
+
+                    <!-- Productos -->
+                    <div class="mb-3">
+                        <strong class="d-block mb-2">
+                            <i class="bi bi-cart3"></i> Productos:
+                        </strong>
+                        <div class="list-group list-group-flush">
+                            <div th:each="detalle : ${pedido.detalles}" 
+                                 class="list-group-item px-0 py-2 border-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-primary rounded-pill" 
+                                              th:text="${detalle.cantidad}">1</span>
+                                        <small th:text="${detalle.nombreProducto}">Producto</small>
+                                    </div>
+                                    <small class="text-muted">
+                                        S/ <span th:text="${#numbers.formatDecimal(detalle.subtotal, 1, 2)}">0.00</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="border-top pt-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>Total:</strong>
+                            <h5 class="mb-0 text-primary">
+                                S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}">0.00</span>
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer con acciones -->
+                <div th:if="${mostrarAccion && !pedido.estado.esFinal()}" class="card-footer bg-white border-top-0">
+                    <div class="d-grid gap-2">
+                        <form th:action="@{/admin/pedidos/{id}/avanzar(id=${pedido.idPedido})}" 
+                              method="post"
+                              onsubmit="return confirm('¿Avanzar este pedido?')"
+                              th:if="${pedido.siguienteEstado != null}">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-arrow-right-circle"></i>
+                                <span th:text="'Marcar como ' + ${pedido.siguienteEstado.displayName}">Avanzar</span>
+                            </button>
+                        </form>
+                        
+                        <!-- Botón cancelar solo para pendientes y en preparación -->
+                        <button th:if="${pedido.estado.name() == 'PENDIENTE' || pedido.estado.name() == 'EN_PREPARACION'}"
+                                type="button" 
+                                class="btn btn-outline-danger btn-sm" 
+                                data-bs-toggle="modal" 
+                                th:attr="data-bs-target='#modalCancelar' + ${pedido.idPedido}">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales de cancelación -->
+    <div th:each="pedido : ${pedidos}" 
+         th:if="${mostrarAccion && (pedido.estado.name() == 'PENDIENTE' || pedido.estado.name() == 'EN_PREPARACION')}"
+         class="modal fade" 
+         th:id="'modalCancelar' + ${pedido.idPedido}" 
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Cancelar Pedido <span th:text="${pedido.codigoPedido}">ABC123</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/admin/pedidos/{id}/cancelar(id=${pedido.idPedido})}" method="post">
+                    <div class="modal-body">
+                        <p>¿Estás seguro de cancelar este pedido?</p>
+                        <div class="mb-3">
+                            <label for="motivo" class="form-label">Motivo de cancelación:</label>
+                            <textarea class="form-control" 
+                                      id="motivo" 
+                                      name="motivo" 
+                                      rows="3"
+                                      placeholder="Explica el motivo..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x"></i> Cerrar
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-check"></i> Sí, Cancelar Pedido
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

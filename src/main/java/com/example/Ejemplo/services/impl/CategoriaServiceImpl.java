@@ -2,7 +2,7 @@ package com.example.Ejemplo.services.impl;
 
 import com.example.Ejemplo.dto.CategoriaCreateDTO;
 import com.example.Ejemplo.dto.CategoriaDTO;
-import com.example.Ejemplo.dto.CategoriaMapper;
+import com.example.Ejemplo.mapper.CategoriaMapper;
 import com.example.Ejemplo.dto.CategoriaResponseDTO;
 import com.example.Ejemplo.models.Categoria;
 import com.example.Ejemplo.repository.CategoriaRepository;

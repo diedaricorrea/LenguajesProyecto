@@ -18,6 +18,11 @@ public class NotificacionServiceImpl implements NotificacionService {
     public void sendNotificacion(int idUsuario, String mensaje) {
         notificacionRepository.sendNotificacion(idUsuario, mensaje);
     }
+    
+    @Override
+    public void crearNotificacion(int idUsuario, String mensaje) {
+        notificacionRepository.sendNotificacion(idUsuario, mensaje);
+    }
 
     @Override
     public List<Notificacion> findAllByUsuario_IdUsuario(int idUsuario) {
