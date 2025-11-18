@@ -1,7 +1,5 @@
 package com.example.Ejemplo.config;
 
-
-import com.example.Ejemplo.models.Permiso;
 import com.example.Ejemplo.models.Usuario;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

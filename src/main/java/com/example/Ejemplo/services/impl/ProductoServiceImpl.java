@@ -21,10 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Implementación del servicio de Productos usando DTOs
- * REFACTORIZADO: Separación de responsabilidades y uso de DTOs
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j

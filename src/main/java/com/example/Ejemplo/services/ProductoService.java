@@ -10,10 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Servicio para gestión de productos usando DTOs
- * NOTA: Las funciones de carrito deberían estar en CarritoService (separación de responsabilidades)
- */
+
 public interface ProductoService {
     
     // ============= CONSULTAS =============

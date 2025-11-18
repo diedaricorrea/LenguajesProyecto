@@ -16,9 +16,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Implementación del servicio de Categorías usando DTOs
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j

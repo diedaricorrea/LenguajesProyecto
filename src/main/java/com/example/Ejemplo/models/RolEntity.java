@@ -10,10 +10,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * Entidad que representa los roles del sistema
- * Un rol agrupa varios permisos
- */
+
 @Entity
 @Getter
 @Setter

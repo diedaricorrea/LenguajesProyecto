@@ -341,86 +341,6 @@
                 return false;
             }
         });
-
-        // EXPLICACION PARA QUE ENTIENDAN EL FUNCIONAMIENTO DEL MODAL DE CREACION DE CATEGORIAS USANDO AJAX Y FETCH API SIN CAMBIAR EL POST DEL BACKEND
-        
-        /*
-         * ============================================================================
-         * MODAL DE CREACIÓN DE CATEGORÍAS - DOCUMENTACIÓN COMPLETA
-         * ============================================================================
-         * 
-         * PROBLEMA ORIGINAL:
-         * - El link a /admin/categorias/nueva abría una nueva pestaña
-         * - Se perdía el contexto del formulario de producto
-         * - Mala experiencia de usuario (navegación innecesaria)
-         * 
-         * SOLUCIÓN IMPLEMENTADA:
-         * Modal de Bootstrap que permite crear categorías sin salir del formulario
-         * 
-         * ============================================================================
-         * CÓMO FUNCIONA (SIN NECESIDAD DE NUEVA API REST)
-         * ============================================================================
-         * 
-         * 1. REUTILIZACIÓN DE ENDPOINT EXISTENTE:
-         *    - El modal usa el mismo endpoint que el formulario normal de categorías
-         *    - Endpoint: POST /admin/categorias/guardar
-         *    - Este endpoint YA EXISTE en CategoriaAdminController.java
-         * 
-         * 2. DIFERENCIA CLAVE:
-         *    ┌─────────────────────┬──────────────────────────────────────────┐
-         *    │ Formulario Normal   │ Modal (AJAX)                             │
-         *    ├─────────────────────┼──────────────────────────────────────────┤
-         *    │ <form action="..."> │ fetch('/admin/categorias/guardar')       │
-         *    │ Recarga la página   │ NO recarga la página                     │
-         *    │ Navega a otra vista │ Permanece en la misma vista              │
-         *    │ Redirect server     │ Manipulación del DOM con JavaScript      │
-         *    └─────────────────────┴──────────────────────────────────────────┘
-         * 
-         * 3. TECNOLOGÍA USADA:
-         *    - Fetch API: Para hacer peticiones HTTP asíncronas (AJAX)
-         *    - No requiere jQuery ni librerías adicionales
-         *    - Nativo de JavaScript moderno (ES6+)
-         * 
-         * 4. FLUJO COMPLETO:
-         * 
-         *    [PASO 1] Usuario hace clic en botón "+" junto al select de categorías
-         *             ↓
-         *    [PASO 2] Se abre el modal de Bootstrap (id="modalNuevaCategoria")
-         *             ↓
-         *    [PASO 3] Usuario ingresa nombre y descripción
-         *             ↓
-         *    [PASO 4] Usuario hace clic en "Guardar Categoría"
-         *             ↓
-         *    [PASO 5] JavaScript captura el evento y hace validación
-         *             ↓
-         *    [PASO 6] Se envía petición POST al servidor usando Fetch API
-         *             ├── URL: /admin/categorias/guardar
-         *             ├── Method: POST
-         *             ├── Headers: application/x-www-form-urlencoded
-         *             └── Body: nombre=XXX&descripcion=YYY
-         *             ↓
-         *    [PASO 7] El servidor procesa la petición (CategoriaAdminController)
-         *             ├── Valida los datos
-         *             ├── Crea la categoría en la base de datos
-         *             └── Retorna respuesta HTTP 200 OK (o error)
-         *             ↓
-         *    [PASO 8] JavaScript recibe la respuesta del servidor
-         *             ↓
-         *    [PASO 9] Si es exitoso:
-         *             ├── Crea un nuevo <option> con la categoría
-         *             ├── Lo agrega al <select id="categoria">
-         *             ├── Lo selecciona automáticamente
-         *             ├── Cierra el modal
-         *             ├── Limpia el formulario del modal
-         *             └── Muestra notificación de éxito (3 segundos)
-         *             ↓
-         *    [PASO 10] Usuario continúa con el formulario de producto
-         *              (La nueva categoría ya está seleccionada)
-         * 
-         * ============================================================================
-         * CÓDIGO DETALLADO CON EXPLICACIONES
-         * ============================================================================
-         */
         
         // Crear nueva categoria desde el modal
         document.getElementById('btnGuardarCategoria').addEventListener('click', function() {
@@ -440,10 +360,8 @@
             btnGuardar.disabled = true;
             btnGuardar.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
             
-            // 4. PETICIÓN ASÍNCRONA AL SERVIDOR
-            //    FETCH API - Permite hacer peticiones HTTP sin recargar la página
+            // 4. PETICIÓN ASÍNCRONA AL SERVIDOR YA QUE FETCH API - Permite hacer peticiones HTTP sin recargar la página
             fetch('/admin/categorias/guardar', {
-                // Método HTTP: POST (mismo que el formulario normal usa)
                 method: 'POST',
                 
                 // Headers: Le dice al servidor qué tipo de datos enviamos
@@ -465,7 +383,6 @@
                 // response.ok es true si el código HTTP está entre 200-299
                 if (response.ok) {
                     // 6. ACTUALIZAR EL DOM - Agregar la nueva categoría al select
-                    //    Esto se hace en el cliente, sin recargar la página
                     const select = document.getElementById('categoria');
                     const option = document.createElement('option'); // Crear nuevo <option>
                     option.value = nombre;  // El value que se envía al servidor
@@ -508,28 +425,6 @@
             });
         });
         
-        /*
-         * ============================================================================
-         * EVENTO DE LIMPIEZA DEL MODAL
-         * ============================================================================
-         * 
-         * PROPÓSITO:
-         * - Limpiar los campos del formulario cuando el modal se cierra
-         * - Evita que datos antiguos aparezcan si se reabre el modal
-         * 
-         * EVENTO: 'hidden.bs.modal'
-         * - Es un evento de Bootstrap que se dispara DESPUÉS de que el modal se cierra
-         * - Garantiza que la animación de cierre termine antes de limpiar
-         * 
-         * POR QUÉ ES NECESARIO:
-         * - Si el usuario cierra el modal con "X" o "Cancelar" sin guardar
-         * - Los datos ingresados quedarían en los inputs
-         * - Al reabrir el modal, vería los datos antiguos
-         * 
-         * ALTERNATIVAS:
-         * - También limpiamos con .reset() después de guardar exitosamente
-         * - Este evento es para casos donde se cierra sin guardar
-         */
         document.getElementById('modalNuevaCategoria').addEventListener('hidden.bs.modal', function () {
             document.getElementById('formNuevaCategoria').reset();
         });

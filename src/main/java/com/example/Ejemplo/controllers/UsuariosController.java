@@ -23,6 +23,7 @@ public class UsuariosController {
     private final NotificacionServiceImpl notificacionServiceImpl;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
     @Autowired
     public UsuariosController(UsuarioServiceImpl usuarioServiceImpl, NotificacionServiceImpl notificacionServiceImpl) {
         this.usuarioServiceImpl = usuarioServiceImpl;

@@ -19,10 +19,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Controlador para la gestion administrativa de productos
- * Separado del ProductoController del catalogo publico para mejor organizacion
- */
 @Controller
 @RequestMapping("/admin/productos")
 @RequiredArgsConstructor
