@@ -122,11 +122,18 @@ public class UsuarioMapper {
             return null;
         }
         
-        Usuario usuario = new Usuario();
+        Usuario usuario = new Usuario();    
         usuario.setNombre(dto.getNombre());
-        usuario.setCorreo(dto.getCorreo());
+        usuario.setCodigoEstudiantil(dto.getCodigoEstudiantil());
+        // Auto-generar correo estudiantil: codigoEstudiantil@utp.edu.pe
+        usuario.setCorreo(dto.getCodigoEstudiantil() + "@utp.edu.pe");
         usuario.setPassword(dto.getPassword()); // Sin encriptar, se hace en el servicio
-        usuario.setRol(Rol.USUARIO); // Forzar rol USUARIO
+        
+        // Buscar RolEntity "USUARIO"
+        RolEntity rolUsuario = rolEntityRepository.findByNombre("USUARIO")
+                .orElseThrow(() -> new IllegalArgumentException("Rol USUARIO no encontrado en el sistema"));
+        usuario.setRolEntity(rolUsuario);
+        usuario.setRol(Rol.USUARIO); // Compatibilidad enum
         usuario.setEstado(true);
         
         return usuario;

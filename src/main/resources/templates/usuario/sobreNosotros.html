@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre Nosotros - Coffee UTPedidos</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    
+    <style>
+        :root {
+            --primary-brown: #c26b1d;
+            --dark-brown: #8f542c;
+            --light-brown: #d4823e;
+            --coffee-dark: #5c3a1e;
+            --utp-green: #003b2b;
+            --white: #ffffff;
+            --off-white: #f8f9fa;
+            --light-gray: #f1f1f1;
+            --text-gray: #4b4b4b;
+        }
+        
+        body {
+            background-color: var(--off-white);
+        }
+        
+        .hero-about {
+            background: linear-gradient(135deg, var(--coffee-dark) 0%, var(--dark-brown) 50%, var(--primary-brown) 100%);
+            color: white;
+            padding: 100px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-about::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.05" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover;
+            opacity: 0.1;
+        }
+        
+        .hero-about h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .hero-about p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+        }
+        
+        .section-title {
+            color: var(--coffee-dark);
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary-brown);
+            border-radius: 2px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 2px solid var(--light-gray);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(140, 84, 44, 0.15);
+            border-color: var(--primary-brown);
+        }
+        
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .feature-card h4 {
+            color: var(--dark-brown);
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+        
+        .stats-section {
+            background: linear-gradient(135deg, var(--primary-brown) 0%, var(--dark-brown) 100%);
+            color: white;
+            padding: 60px 0;
+            margin: 60px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .values-section {
+            padding: 60px 0;
+        }
+        
+        .value-item {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-brown);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .value-item:hover {
+            box-shadow: 0 8px 12px rgba(140, 84, 44, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .value-item h5 {
+            color: var(--dark-brown);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .value-item p {
+            color: var(--text-gray);
+            margin: 0;
+        }
+        
+        .schedule-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 6px 20px rgba(140, 84, 44, 0.1);
+        }
+        
+        .schedule-card h4 {
+            color: var(--coffee-dark);
+            margin-bottom: 30px;
+        }
+        
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: var(--off-white);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-brown);
+        }
+        
+        .schedule-day {
+            font-weight: 600;
+            color: var(--dark-brown);
+        }
+        
+        .schedule-time {
+            color: var(--text-gray);
+        }
+        
+        .contact-section {
+            background: var(--light-gray);
+            padding: 60px 0;
+        }
+        
+        .contact-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            height: 100%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .contact-card i {
+            font-size: 2.5rem;
+            color: var(--primary-brown);
+            margin-bottom: 15px;
+        }
+        
+        .contact-card h5 {
+            color: var(--dark-brown);
+            margin-bottom: 10px;
+        }
+        
+        .contact-card p {
+            color: var(--text-gray);
+            margin: 0;
+        }
+        
+        /* Fix modal backdrop - permitir clicks en inputs */
+        .modal {
+            z-index: 1055 !important;
+        }
+        
+        .modal-backdrop {
+            z-index: 1050 !important;
+        }
+        
+        .modal-dialog {
+            z-index: 1056 !important;
+        }
+        
+        .modal-content {
+            position: relative;
+            z-index: 1057 !important;
+        }
+        
+        /* Fix footer al final */
+        html, body {
+            height: 100%;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        footer {
+            margin-top: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-about h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-about p {
+                font-size: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbarUsuario :: navbarU}"></div>
+
+    <!-- Hero Section -->
+    <section class="hero-about text-center">
+        <div class="container">
+            <i class="bi bi-cup-hot-fill mb-4" style="font-size: 4rem;"></i>
+            <h1>Sobre Nosotros</h1>
+            <p class="lead">Tu cafetería universitaria de confianza</p>
+        </div>
+    </section>
+
+    <!-- Quiénes Somos -->
+    <section class="container py-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="section-title">¿Quiénes Somos?</h2>
+                <p class="lead" style="color: var(--text-gray); line-height: 1.8;">
+                    Coffee UTPedidos es la cafetería oficial de la Universidad Tecnológica del Perú. 
+                    Desde nuestros inicios, nos hemos dedicado a proporcionar alimentos frescos, nutritivos 
+                    y deliciosos a toda nuestra comunidad universitaria. Nuestro compromiso es brindar un 
+                    servicio de calidad que se adapte al ritmo de vida de los estudiantes y trabajadores de la UTP.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Características -->
+    <section class="container py-5">
+        <h2 class="section-title text-center">¿Por Qué Elegirnos?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <i class="bi bi-clock-history feature-icon" style="color: var(--primary-brown);"></i>
+                    <h4>Servicio Rápido</h4>
+                    <p>Ordena en línea y recoge tu pedido sin esperas. Optimizamos tu tiempo entre clases para que puedas disfrutar de tu comida sin retrasos.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <i class="bi bi-patch-check-fill feature-icon" style="color: var(--utp-green);"></i>
+                    <h4>Calidad Garantizada</h4>
+                    <p>Ingredientes frescos y preparados diariamente. Cada plato es elaborado con los más altos estándares de calidad e higiene.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <i class="bi bi-wallet2 feature-icon" style="color: var(--dark-brown);"></i>
+                    <h4>Precios Accesibles</h4>
+                    <p>Menús económicos diseñados especialmente para estudiantes universitarios. Calidad al mejor precio.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Estadísticas -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number">5000+</div>
+                        <div class="stat-label">Estudiantes Atendidos</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Productos Diferentes</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">Años de Experiencia</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number">98%</div>
+                        <div class="stat-label">Satisfacción</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Valores -->
+    <section class="values-section">
+        <div class="container">
+            <h2 class="section-title text-center">Nuestros Valores</h2>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="value-item">
+                        <h5><i class="bi bi-star-fill me-2" style="color: var(--primary-brown);"></i>Excelencia</h5>
+                        <p>Nos esforzamos por ofrecer productos y servicios de la más alta calidad en cada interacción.</p>
+                    </div>
+                    <div class="value-item">
+                        <h5><i class="bi bi-people-fill me-2" style="color: var(--primary-brown);"></i>Orientación al Cliente</h5>
+                        <p>Nuestros estudiantes son nuestra prioridad. Escuchamos y nos adaptamos a sus necesidades.</p>
+                    </div>
+                    <div class="value-item">
+                        <h5><i class="bi bi-shield-check me-2" style="color: var(--primary-brown);"></i>Confiabilidad</h5>
+                        <p>Cumplimos nuestros compromisos con puntualidad, calidad y transparencia en cada servicio.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="value-item">
+                        <h5><i class="bi bi-heart-fill me-2" style="color: var(--primary-brown);"></i>Pasión</h5>
+                        <p>Amamos lo que hacemos y se refleja en cada plato que preparamos para nuestra comunidad.</p>
+                    </div>
+                    <div class="value-item">
+                        <h5><i class="bi bi-lightbulb-fill me-2" style="color: var(--primary-brown);"></i>Innovación</h5>
+                        <p>Constantemente mejoramos nuestros procesos y menús para ofrecer la mejor experiencia.</p>
+                    </div>
+                    <div class="value-item">
+                        <h5><i class="bi bi-recycle me-2" style="color: var(--primary-brown);"></i>Sostenibilidad</h5>
+                        <p>Nos comprometemos con prácticas responsables y el cuidado del medio ambiente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Horarios -->
+    <section class="container py-5">
+        <h2 class="section-title text-center">Horarios de Atención</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="schedule-card">
+                    <h4 class="text-center"><i class="bi bi-calendar-check me-2"></i>Horario Semanal</h4>
+                    <div class="schedule-item">
+                        <span class="schedule-day">Lunes a Viernes</span>
+                        <span class="schedule-time">7:00 AM - 8:00 PM</span>
+                    </div>
+                    <div class="schedule-item">
+                        <span class="schedule-day">Sábados</span>
+                        <span class="schedule-time">8:00 AM - 3:00 PM</span>
+                    </div>
+                    <div class="schedule-item">
+                        <span class="schedule-day">Domingos</span>
+                        <span class="schedule-time text-danger fw-bold">Cerrado</span>
+                    </div>
+                    <div class="alert alert-info mt-4 mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Nota:</strong> Horarios sujetos a cambios durante periodos de exámenes y vacaciones.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacto -->
+    <section class="contact-section">
+        <div class="container">
+            <h2 class="section-title text-center">Contáctanos</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="contact-card">
+                        <i class="bi bi-envelope-fill"></i>
+                        <h5>Email</h5>
+                        <p>cafeteria@utp.edu.pe</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="contact-card">
+                        <i class="bi bi-telephone-fill"></i>
+                        <h5>Teléfono</h5>
+                        <p>(01) 315-9600</p>
+                        <small class="text-muted">Ext. 2500</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="contact-card">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <h5>Ubicación</h5>
+                        <p>Campus UTP</p>
+                        <small class="text-muted">Piso 1, Ala Sur</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer con diseño UTP -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Columna 1: Logo y descripción -->
+                <div class="col-md-4">
+                    <h5 class="mb-3">
+                        <i class="bi bi-cup-hot-fill text-warning me-2"></i>
+                        Coffee UTPedidos
+                    </h5>
+                    <p class="text-white-50 small">
+                        La cafetería oficial de la Universidad Tecnológica del Perú. 
+                        Calidad y sabor en cada pedido.
+                    </p>
+                </div>
+                
+                <!-- Columna 2: Enlaces rápidos -->
+                <div class="col-md-4">
+                    <h6 class="mb-3">Enlaces Rápidos</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a th:href="@{/catalogo}" class="text-white-50 text-decoration-none">
+                                <i class="bi bi-grid-fill me-2"></i>Catálogo
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a th:href="@{/sobre-nosotros}" class="text-white-50 text-decoration-none">
+                                <i class="bi bi-info-circle-fill me-2"></i>Sobre Nosotros
+                            </a>
+                        </li>
+                        <li class="mb-2" sec:authorize="isAuthenticated()">
+                            <a th:href="@{/carrito}" class="text-white-50 text-decoration-none">
+                                <i class="bi bi-cart-fill me-2"></i>Mi Carrito
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Columna 3: Contacto -->
+                <div class="col-md-4">
+                    <h6 class="mb-3">Contacto</h6>
+                    <ul class="list-unstyled text-white-50 small">
+                        <li class="mb-2">
+                            <i class="bi bi-envelope-fill me-2"></i>
+                            cafeteria@utp.edu.pe
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-telephone-fill me-2"></i>
+                            (01) 315-9600
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-geo-alt-fill me-2"></i>
+                            UTP - Piso 2, Cafetería
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <hr class="my-4 bg-secondary">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-0 small text-white-50">
+                        &copy; 2025 Coffee UTPedidos - Universidad Tecnológica del Perú | Todos los derechos reservados
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modales de Login/Registro -->
+    <div th:replace="~{fragments/loginModal :: loginModal}"></div>
+    <div th:replace="~{fragments/loginModal :: registerModal}"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/notificacion.js}"></script>
+</body>
+
+</html>

@@ -19,14 +19,15 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                    // Recursos públicos
-                    .requestMatchers("/register", "/register/save", "/login", "/css/**", "/js/**", "/imagenes/**", "/data/**").permitAll()
+                    // Recursos públicos (sin /login ni /register ni /medio)
+                    .requestMatchers("/register/save", "/sobre-nosotros", "/css/**", "/js/**", "/imagenes/**", "/data/**").permitAll()
                     
-                    // Catálogo - Requiere permiso PRODUCTOS_VER
-                    .requestMatchers("/catalogo", "/catalogo/**").hasAnyAuthority("PRODUCTOS_VER", "ROLE_ADMINISTRADOR", "ROLE_USUARIO", "ROLE_TRABAJADOR")
+                    // Catálogo - PÚBLICO (estudiantes pueden ver sin login)
+                    .requestMatchers("/", "/catalogo", "/catalogo/**").permitAll()
                     
-                    // Carrito - Requiere permiso CARRITO_GESTIONAR
-                    .requestMatchers("/carrito/**").hasAnyAuthority("CARRITO_GESTIONAR", "ROLE_ADMINISTRADOR", "ROLE_USUARIO", "ROLE_TRABAJADOR")
+                    // Carrito y Pedidos - REQUIERE LOGIN (estudiantes deben registrarse para comprar)
+                    .requestMatchers("/carrito/**").authenticated()
+                    .requestMatchers("/pedidos/pedir", "/pedidos/realizar").authenticated()
                     
                     // Productos Admin - Requiere permisos específicos
                     .requestMatchers("/productos/crear", "/productos/nuevo").hasAnyAuthority("PRODUCTOS_CREAR", "ROLE_ADMINISTRADOR", "ROLE_TRABAJADOR")
@@ -40,11 +41,11 @@ public class SecurityConfig {
                     .requestMatchers("/categorias/eliminar/**").hasAnyAuthority("CATEGORIAS_ELIMINAR", "ROLE_ADMINISTRADOR")
                     .requestMatchers("/categorias", "/categorias/**").hasAnyAuthority("CATEGORIAS_VER", "ROLE_ADMINISTRADOR", "ROLE_TRABAJADOR")
                     
-                    // Pedidos - Usuario puede crear, Admin/Trabajador pueden gestionar
+                    // Pedidos Admin - Solo admin/trabajadores
                     .requestMatchers("/admin/pedidos", "/admin/pedidos/**").hasAnyAuthority("PEDIDOS_GESTIONAR", "ROLE_ADMINISTRADOR", "ROLE_TRABAJADOR")
-                    .requestMatchers("/pedidos/pedir").hasAnyAuthority("PEDIDOS_CREAR", "ROLE_ADMINISTRADOR", "ROLE_USUARIO", "ROLE_TRABAJADOR")
-                    .requestMatchers("/pedidos/**").hasAnyAuthority("PEDIDOS_VER", "PEDIDOS_GESTIONAR", "ROLE_ADMINISTRADOR", "ROLE_USUARIO", "ROLE_TRABAJADOR")
-                    .requestMatchers("/pedidos").hasAnyAuthority("PEDIDOS_VER", "ROLE_ADMINISTRADOR", "ROLE_USUARIO", "ROLE_TRABAJADOR")
+                    
+                    // Pedidos de usuario - Cualquier usuario autenticado
+                    .requestMatchers("/pedidos", "/pedidos/**").authenticated()
                     
                     // Usuarios - Solo admin
                     .requestMatchers("/usuarios/**").hasAnyAuthority("USUARIOS_VER", "ROLE_ADMINISTRADOR")
@@ -70,11 +71,12 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                     .loginPage("/login")
+                    .loginProcessingUrl("/login")
                     .defaultSuccessUrl("/login2", true)
                     .permitAll()
             )
             .logout(logout -> logout
-                    .logoutSuccessUrl("/login?logout")
+                    .logoutSuccessUrl("/catalogo")
                     .permitAll()
             );
             // No especificar accessDeniedPage, dejar que el ErrorController lo maneje

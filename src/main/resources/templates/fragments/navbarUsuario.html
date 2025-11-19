@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="https://www.thymeleaf.org">
+<html lang="es" xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <title>navbar</title>
@@ -7,69 +7,110 @@
 
 <body>
 <header th:fragment="navbarU">
-    <nav class="navbar navbar-expand-lg custom-navbar">
-        <div class="container-fluid">
+    <nav class="navbar navbar-expand-lg custom-navbar sticky-top shadow-sm">
+        <div class="container-fluid px-4">
             <!-- LOGO -->
-            <a class="navbar-brand d-flex align-items-center me-4" href="#">
+            <a class="navbar-brand d-flex align-items-center me-4" th:href="@{/catalogo}">
+                <i class="bi bi-cup-hot-fill me-2 fs-4 text-warning"></i>
                 <span class="logo-coffee">Coffee</span>
                 <span class="logo-utpedidos">UTPedidos</span>
             </a>
+            
             <!-- Botón responsive -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <!-- Contenido navbar -->
             <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
                 <!-- Enlaces a la izquierda -->
-                <ul class="navbar-nav gap-4">
-                    <li class="nav-item d-flex align-items-center">
-                        <i class="bi bi-grid-fill"></i>
-                        <a class="nav-link nav-link-custom" th:href="@{/catalogo}">MENÚ</a>
+                <ul class="navbar-nav gap-3 mx-auto mx-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom d-flex align-items-center" th:href="@{/catalogo}">
+                            <i class="bi bi-grid-fill me-2"></i>
+                            <span>Menú</span>
+                        </a>
                     </li>
-                    <li class="nav-item d-flex align-items-center">
-                        <i class="bi bi-cart-fill"></i>
-                        <a class="nav-link nav-link-custom" th:href="@{/carrito}">CARRITO</a>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link nav-link-custom d-flex align-items-center" th:href="@{/carrito}">
+                            <i class="bi bi-cart-fill me-2"></i>
+                            <span>Carrito</span>
+                        </a>
                     </li>
-                    <li class="nav-item d-flex align-items-center">
-                        <i class="bi bi-receipt-cutoff"></i>
-                        <a class="nav-link nav-link-custom" th:href="@{/pedidos}">PEDIDOS</a>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link nav-link-custom d-flex align-items-center" th:href="@{/pedidos}">
+                            <i class="bi bi-receipt-cutoff me-2"></i>
+                            <span>Pedidos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom d-flex align-items-center" th:href="@{/sobre-nosotros}">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <span>Nosotros</span>
+                        </a>
                     </li>
                 </ul>
-                <div class="d-flex align-items-center ms-auto">
-                    <!-- Icono de campana -->
-                    <div class="notification-bell" onclick="toggleNotifications()" style="cursor: pointer;">
-                        <i class="bi bi-bell-fill"></i>
+                
+                <!-- Sección derecha -->
+                <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+                    <!-- Notificaciones (solo autenticados) -->
+                    <div class="notification-bell position-relative" sec:authorize="isAuthenticated()" onclick="toggleNotifications()" style="cursor: pointer;">
+                        <i class="bi bi-bell-fill fs-5"></i>
+                        <span class="notification-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                              th:if="${notificaciones != null && !notificaciones.isEmpty()}"
+                              th:text="${notificaciones.size()}">0</span>
                     </div>
-                    <!-- Ícono de usuario a la derecha -->
-                    <div class="dropdown ms-auto">
+                    
+                    <!-- Usuario autenticado -->
+                    <div class="dropdown" sec:authorize="isAuthenticated()">
                         <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
                            id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-fill"></i> <!-- Ícono -->
+                            <div class="user-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                                 style="width: 40px; height: 40px;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <span class="d-none d-md-inline text-dark fw-semibold" th:text="${usuarioNombre}">Usuario</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end text-small shadow"
-                            aria-labelledby="userDropdown">
-                            <li>
-                                <h6>Hola: <span th:text="${usuarioNombre}"></span></h6>
+                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                            <li class="px-3 py-2">
+                                <h6 class="mb-0 text-muted">Hola, <span class="text-dark" th:text="${usuarioNombre}"></span></h6>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li sec:authorize="hasAnyAuthority('ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')">
+                                <a class="dropdown-item" th:href="@{/admin/productos}">
+                                    <i class="bi bi-speedometer2 me-2"></i>Panel Admin
+                                </a>
                             </li>
                             <li>
-                                <hr class="dropdown-divider">
+                                <a class="dropdown-item text-danger" th:href="@{/logout}">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+                                </a>
                             </li>
-                            <li th:if="${usuarioAdmins != 'USUARIO'}"><a class="dropdown-item text-danger" th:href="@{/login/medio}">Salir</a></li>
-                            <li><a class="dropdown-item text-danger" th:href="@{/logout}">Cerrar sesión</a></li>
                         </ul>
+                    </div>
+                    
+                    <!-- Botones para usuarios NO autenticados -->
+                    <div class="d-flex gap-2" sec:authorize="!isAuthenticated()">
+                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#loginModal">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>
+                            Iniciar Sesión
+                        </button>
+                        <button class="btn btn-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#registerModal">
+                            <i class="bi bi-person-plus me-1"></i>
+                            Registrarse
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
-    <!-- Modal lateral derecho de notificaciones -->
-    <div id="notification-modal" class="notification-modal hidden" onclick="closeNotifications(event)">
+    
+    <!-- Modal lateral de notificaciones (solo autenticados) -->
+    <div id="notification-modal" class="notification-modal hidden" sec:authorize="isAuthenticated()" onclick="closeNotifications(event)">
         <div class="notification-content" onclick="event.stopPropagation()">
             <div class="notification-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Notificaciones</h5>
                 <div class="d-flex gap-2 align-items-center">
-                    <!-- Botón para limpiar todas -->
                     <button th:if="${notificaciones != null && !notificaciones.isEmpty()}" 
                             type="button"
                             id="btnLimpiarTodas"
@@ -82,14 +123,12 @@
                 </div>
             </div>
             
-            <!-- Mensaje si no hay notificaciones -->
             <div th:if="${notificaciones == null || notificaciones.isEmpty()}" 
                  class="notification-body text-center p-4">
                 <i class="bi bi-bell-slash fs-1 text-muted"></i>
                 <p class="text-muted mt-2">No tienes notificaciones</p>
             </div>
             
-            <!-- Lista de notificaciones (máximo 10 más recientes) -->
             <div th:if="${notificaciones != null && !notificaciones.isEmpty()}" class="notification-body">
                 <div th:each="notificacion, iterStat : ${notificaciones}" 
                      th:if="${iterStat.index < 10}"
@@ -99,17 +138,14 @@
                     <div class="flex-grow-1">
                         <p class="mb-1 fw-semibold" th:text="${notificacion.mensaje}">Mensaje</p>
                     </div>
-                    <!-- Botón para eliminar individual -->
                     <button type="button" 
                             class="btn btn-sm btn-link text-danger p-0 ms-2 btn-eliminar-notif" 
                             th:data-id="${notificacion.idNotificacion}"
-                            title="Eliminar"
-                            style="font-size: 0.9rem;">
+                            title="Eliminar">
                         <i class="bi bi-x-circle"></i>
                     </button>
                 </div>
                 
-                <!-- Mensaje si hay más de 10 notificaciones -->
                 <div th:if="${notificaciones.size() > 10}" 
                      class="text-center p-2 text-muted small">
                     <i class="bi bi-info-circle"></i>
@@ -120,24 +156,17 @@
     </div>
     
     <script>
-        // Obtener el token CSRF
         const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
         
-        // Eliminar notificación individual con AJAX
         document.addEventListener('DOMContentLoaded', function() {
-            // Eliminar notificación individual
             document.querySelectorAll('.btn-eliminar-notif').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const idNotificacion = this.getAttribute('data-id');
                     const notifElement = this.closest('.d-flex');
                     
-                    const headers = {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    };
-                    if (csrfToken && csrfHeader) {
-                        headers[csrfHeader] = csrfToken;
-                    }
+                    const headers = {'Content-Type': 'application/x-www-form-urlencoded'};
+                    if (csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
                     
                     fetch('/notificacion/eliminar', {
                         method: 'POST',
@@ -146,13 +175,10 @@
                     })
                     .then(response => {
                         if (response.ok) {
-                            // Eliminar visualmente
                             notifElement.style.transition = 'opacity 0.3s';
                             notifElement.style.opacity = '0';
                             setTimeout(() => {
                                 notifElement.remove();
-                                
-                                // Actualizar contador
                                 const badge = document.querySelector('.notification-badge');
                                 if (badge) {
                                     const count = parseInt(badge.textContent) - 1;
@@ -160,7 +186,6 @@
                                         badge.textContent = count;
                                     } else {
                                         badge.remove();
-                                        // Mostrar mensaje de "no hay notificaciones"
                                         const notifBody = document.querySelector('.notification-body');
                                         if (notifBody && notifBody.children.length === 0) {
                                             location.reload();
@@ -169,13 +194,11 @@
                                 }
                             }, 300);
                         }
-                    })
-                    .catch(error => console.error('Error:', error));
+                    });
                 });
             });
         });
         
-        // Confirmación para limpiar todas las notificaciones con SweetAlert2
         function confirmarLimpiarNotificaciones() {
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
@@ -190,57 +213,22 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        const headers = {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        };
-                        if (csrfToken && csrfHeader) {
-                            headers[csrfHeader] = csrfToken;
-                        }
+                        const headers = {'Content-Type': 'application/x-www-form-urlencoded'};
+                        if (csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
                         
-                        // Eliminar todas con AJAX
                         fetch('/notificacion/eliminar-todas', {
                             method: 'POST',
                             headers: headers
                         })
                         .then(response => {
-                            if (response.ok) {
-                                // Recargar la página para actualizar todo
-                                location.reload();
-                            } else {
-                                Swal.fire('Error', 'No se pudieron eliminar las notificaciones', 'error');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            Swal.fire('Error', 'Error de conexión', 'error');
+                            if (response.ok) location.reload();
+                            else Swal.fire('Error', 'No se pudieron eliminar las notificaciones', 'error');
                         });
                     }
                 });
-            } else {
-                // Fallback si SweetAlert2 no está disponible
-                if (confirm('¿Eliminar todas las notificaciones?')) {
-                    const headers = {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    };
-                    if (csrfToken && csrfHeader) {
-                        headers[csrfHeader] = csrfToken;
-                    }
-                    
-                    fetch('/notificacion/eliminar-todas', {
-                        method: 'POST',
-                        headers: headers
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            location.reload();
-                        }
-                    });
-                }
             }
         }
     </script>
-
 </header>
 </body>
-
 </html>

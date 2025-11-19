@@ -24,6 +24,9 @@ public class Usuario {
     @NotBlank(message = "El nombre no puede estar vacio")
     @Size(min = 3, max = 50, message = "El nombre debe tener minimo 3 caracteres")
     private String nombre;
+    
+    @Column(name = "codigo_estudiantil", unique = true, length = 20)
+    private String codigoEstudiantil; // C\u00f3digo estudiantil para estudiantes
 
     @Column(name = "correo", unique = true, nullable = false)
     private String correo;

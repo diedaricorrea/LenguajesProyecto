@@ -26,6 +26,11 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     Optional<Usuario> findByCorreo(String correo);
     
     /**
+     * Busca usuario por código estudiantil
+     */
+    Optional<Usuario> findByCodigoEstudiantil(String codigoEstudiantil);
+    
+    /**
      * Busca usuarios por nombre (búsqueda parcial, case insensitive)
      */
     List<Usuario> findByNombreContainingIgnoreCase(String nombre);
@@ -87,6 +92,11 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
      * Verifica si existe un correo (útil para validación)
      */
     boolean existsByCorreo(String correo);
+    
+    /**
+     * Verifica si existe un código estudiantil (útil para validación)
+     */
+    boolean existsByCodigoEstudiantil(String codigoEstudiantil);
     
     /**
      * Verifica si existe un correo excluyendo un ID específico (útil para actualización)

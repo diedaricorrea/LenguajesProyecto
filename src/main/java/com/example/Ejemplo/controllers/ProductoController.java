@@ -3,6 +3,7 @@ package com.example.Ejemplo.controllers;
 import java.util.List;
 
 import com.example.Ejemplo.config.UsuarioDetails;
+import com.example.Ejemplo.dto.UsuarioRegistroDTO;
 import com.example.Ejemplo.models.Carrito;
 import com.example.Ejemplo.models.Producto;
 import com.example.Ejemplo.models.Usuario;
@@ -42,18 +43,29 @@ public class ProductoController {
     }
 
     @GetMapping()
-    @PreAuthorize("hasAnyAuthority('PRODUCTOS_VER', 'ROLE_ADMINISTRADOR', 'ROLE_USUARIO', 'ROLE_TRABAJADOR')")
     public String index(
             @RequestParam(required = false) String categoria,
             @RequestParam(required = false) String busqueda,
             @RequestParam(defaultValue = "0") int page,
             @AuthenticationPrincipal UsuarioDetails userDetails,
             Model model) {
-        Usuario usuario = userDetails.getUsuario();
+        Usuario usuario = userDetails != null ? userDetails.getUsuario() : null;
 
-        String rolNombre = usuario.getRol() != null ? usuario.getRol().toString() : "USUARIO";
-        model.addAttribute("usuarioAdmins", rolNombre);
-        model.addAttribute("usuarioNombre", usuario.getNombre());
+        // Solo agregar datos de usuario si está autenticado
+        if (usuario != null) {
+            String rolNombre = usuario.getRol() != null ? usuario.getRol().toString() : "USUARIO";
+            model.addAttribute("usuarioAdmins", rolNombre);
+            model.addAttribute("usuarioNombre", usuario.getNombre());
+            model.addAttribute("notificaciones", notificacionServiceImpl.findAllByUsuario_IdUsuario(usuario.getIdUsuario()));
+        } else {
+            model.addAttribute("usuarioAdmins", "INVITADO");
+            model.addAttribute("usuarioNombre", "Invitado");
+        }
+        
+        // Agregar objeto para el formulario de registro (modales)
+        if (!model.containsAttribute("usuarioRegistro")) {
+            model.addAttribute("usuarioRegistro", new UsuarioRegistroDTO());
+        }
 
         int pageSize = 6;
         Pageable pageable = PageRequest.of(page, pageSize);
@@ -86,7 +98,7 @@ public class ProductoController {
         if (busqueda != null && !busqueda.isEmpty() && productosPage.isEmpty()) {
             model.addAttribute("noResultados", "Lo sentimos, no pudimos encontrar ese producto.");
         }
-        model.addAttribute("notificaciones",notificacionServiceImpl.findAllByUsuario_IdUsuario(usuario.getIdUsuario()));
+        
         model.addAttribute("productos", productosPage.getContent());
         model.addAttribute("productosPage", productosPage);
         model.addAttribute("currentPage", page);

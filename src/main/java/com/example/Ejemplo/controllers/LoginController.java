@@ -30,19 +30,16 @@ public class LoginController {
         this.usuarioService = usuarioService;
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "login/login";
+    @GetMapping("/")
+    public String inicio() {
+        return "redirect:/catalogo";
     }
-
-    @PostMapping("/login")
-    public String login2() {
-        return "login/login";
-    }
-
-    @GetMapping("/login/medio")
-    public String loginMedio() {
-        return "login/medio";
+    
+    @GetMapping("/sobre-nosotros")
+    public String sobreNosotros(Model model) {
+        // Agregar objeto para el formulario de registro (modales)
+        model.addAttribute("usuarioRegistro", new UsuarioRegistroDTO());
+        return "usuario/sobreNosotros";
     }
 
     /**
@@ -60,23 +57,13 @@ public class LoginController {
         logger.info("Usuario autenticado con rol: {}", rol);
         logger.debug("Todas las autoridades: {}", authentication.getAuthorities());
         
-        // Si tiene rol USUARIO (del catálogo público), va al catálogo
+        // Si tiene rol USUARIO (estudiantes), va al catálogo
         if (rol.equals("ROLE_USUARIO")) {
             return "redirect:/catalogo";
         }
         
-        // Cualquier otro rol (ADMINISTRADOR, TRABAJADOR, roles personalizados) va al panel medio
-        // El panel medio redirigirá según sus permisos
-        return "redirect:/login/medio";
-    }
-
-    /**
-     * Muestra el formulario de registro
-     */
-    @GetMapping("/register")
-    public String registro(Model model) {
-        model.addAttribute("usuarioRegistro", new UsuarioRegistroDTO());
-        return "login/register";
+        // Administradores y trabajadores van directo al panel de productos
+        return "redirect:/admin/productos";
     }
 
     /**
@@ -89,13 +76,14 @@ public class LoginController {
             RedirectAttributes redirectAttributes,
             Model model) {
         
-        logger.info("Intentando registrar nuevo usuario: {}", registroDTO.getCorreo());
+        logger.info("Intentando registrar nuevo usuario con código: {}", registroDTO.getCodigoEstudiantil());
         
         // Validar errores de formulario
         if (resultado.hasErrors()) {
             logger.warn("Errores de validación en el registro");
-            model.addAttribute("usuarioRegistro", registroDTO);
-            return "login/register";
+            redirectAttributes.addFlashAttribute("error", "Por favor verifica los datos del formulario");
+            redirectAttributes.addFlashAttribute("showRegisterModal", true);
+            return "redirect:/catalogo";
         }
         
         try {
@@ -104,21 +92,22 @@ public class LoginController {
             
             logger.info("Usuario registrado exitosamente: {}", creado.getCorreo());
             redirectAttributes.addFlashAttribute("success", 
-                "Usuario registrado con éxito. Ahora puedes iniciar sesión.");
+                "¡Cuenta creada exitosamente! Ya puedes iniciar sesión con tu código: " + registroDTO.getCodigoEstudiantil());
+            redirectAttributes.addFlashAttribute("showLoginModal", true);
             
-            return "redirect:/login";
+            return "redirect:/catalogo";
             
         } catch (IllegalArgumentException e) {
             logger.error("Error de validación al registrar: {}", e.getMessage());
-            model.addAttribute("error", e.getMessage());
-            model.addAttribute("usuarioRegistro", registroDTO);
-            return "login/register";
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("showRegisterModal", true);
+            return "redirect:/catalogo";
             
         } catch (Exception e) {
             logger.error("Error inesperado al registrar usuario", e);
-            model.addAttribute("error", "Error al registrar el usuario. Intente nuevamente.");
-            model.addAttribute("usuarioRegistro", registroDTO);
-            return "login/register";
+            redirectAttributes.addFlashAttribute("error", "Error al registrar el usuario. Intente nuevamente.");
+            redirectAttributes.addFlashAttribute("showRegisterModal", true);
+            return "redirect:/catalogo";
         }
     }
 }

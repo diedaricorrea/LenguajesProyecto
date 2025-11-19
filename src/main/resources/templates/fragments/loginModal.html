@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="https://www.thymeleaf.org">
+<body>
+
+<!-- Login Modal -->
+<div th:fragment="loginModal" class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    Iniciar Sesión
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form th:action="@{/login}" method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="bi bi-person me-1"></i>Usuario
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               name="username" 
+                               id="username" 
+                               placeholder="Código estudiantil o correo" 
+                               required>
+                        <small class="form-text text-muted">
+                            Estudiantes: solo tu código (ej: 2021123456)<br>
+                            Trabajadores: correo completo
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="bi bi-lock me-1"></i>Contraseña
+                        </label>
+                        <div class="input-group">
+                            <input type="password" 
+                                   class="form-control" 
+                                   name="password" 
+                                   id="password" 
+                                   placeholder="Tu contraseña" 
+                                   required>
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-eye-slash toggle-password" 
+                                   data-target="password" 
+                                   style="cursor: pointer;"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#registerModal">
+                            <i class="bi bi-person-plus me-2"></i>Crear cuenta
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Error message -->
+                <div th:if="${param.error}" class="alert alert-danger mt-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Usuario o contraseña incorrectos
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Register Modal -->
+<div th:fragment="registerModal" class="modal fade" id="registerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    <i class="bi bi-person-plus me-2"></i>
+                    Registro de Estudiante
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Info Box -->
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <small><strong>Nota:</strong> Tu correo será <code>tuCódigo@utp.edu.pe</code></small>
+                </div>
+
+                <form th:action="@{/register/save}" th:object="${usuarioRegistro}" method="post">
+                    <!-- Nombre -->
+                    <div class="mb-3">
+                        <label for="nombreReg" class="form-label">
+                            <i class="bi bi-person me-1"></i>Nombre completo
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               th:field="*{nombre}" 
+                               id="nombreReg" 
+                               placeholder="Juan Pérez García" 
+                               required>
+                    </div>
+
+                    <!-- Código -->
+                    <div class="mb-3">
+                        <label for="codigoReg" class="form-label">
+                            <i class="bi bi-credit-card me-1"></i>Código Estudiantil
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               th:field="*{codigoEstudiantil}" 
+                               id="codigoReg" 
+                               placeholder="2021123456" 
+                               required>
+                    </div>
+
+                    <!-- Contraseña -->
+                    <div class="mb-3">
+                        <label for="passwordReg" class="form-label">
+                            <i class="bi bi-lock me-1"></i>Contraseña
+                        </label>
+                        <input type="password" 
+                               class="form-control" 
+                               th:field="*{password}" 
+                               id="passwordReg" 
+                               placeholder="Mínimo 8 caracteres" 
+                               required>
+                    </div>
+
+                    <!-- Confirmar -->
+                    <div class="mb-3">
+                        <label for="confirmarReg" class="form-label">
+                            <i class="bi bi-lock-fill me-1"></i>Confirmar contraseña
+                        </label>
+                        <input type="password" 
+                               class="form-control" 
+                               th:field="*{confirmarPassword}" 
+                               id="confirmarReg" 
+                               placeholder="Repite tu contraseña" 
+                               required>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-person-plus me-2"></i>Crear cuenta
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+                            <i class="bi bi-arrow-left me-2"></i>Ya tengo cuenta
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Fix: Prevenir que el backdrop bloquee los inputs */
+    .modal-backdrop {
+        z-index: 1040 !important;
+        pointer-events: none !important;
+    }
+    
+    .modal {
+        z-index: 1055 !important;
+        pointer-events: auto !important;
+    }
+    
+    .modal-dialog {
+        z-index: 1056 !important;
+        pointer-events: auto !important;
+    }
+    
+    .modal-content {
+        border: none;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 1057 !important;
+        pointer-events: auto !important;
+    }
+    
+    .nav-pills .nav-link {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    
+    .nav-pills .nav-link.active {
+        background-color: var(--cafe-brown, #c26b1d);
+    }
+</style>
+
+<script>
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-password').forEach(icon => {
+        icon.addEventListener('click', function () {
+            const input = document.getElementById(this.dataset.target);
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
+    });
+</script>
+
+</body>
+</html>

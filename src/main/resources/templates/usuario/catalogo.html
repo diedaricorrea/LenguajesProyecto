@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo - UTPedidos</title>
+    <title>Catálogo - Coffee UTPedidos</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,102 +19,428 @@
     <link rel="stylesheet" th:href="@{/css/pedidos.css}">
     <link rel="stylesheet" th:href="@{/css/modal.css}">
     <link rel="stylesheet" th:href="@{/css/error.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
+    
+    <style>
+        /* Estilos inline específicos del catálogo - Diseño Minimalista */
+        
+        /* Fix altura completa para que footer quede al final */
+        html, body {
+            height: 100%;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa;
+        }
+        
+        main {
+            flex: 1 0 auto;
+        }
+        
+        footer {
+            flex-shrink: 0;
+        }
+        
+        /* Filtros modernos estilo chips */
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-chip:hover {
+            background: #c26b1d;
+            color: white;
+            border-color: #c26b1d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(194, 107, 29, 0.3);
+        }
+        
+        .filter-chip.active {
+            background: #c26b1d;
+            color: white;
+            border-color: #c26b1d;
+        }
+        
+        .filter-chip-sm {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 30px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-chip-sm:hover,
+        .filter-chip-sm.active {
+            background: #8f542c;
+            color: white;
+            border-color: #8f542c;
+        }
+        
+        /* Búsqueda moderna */
+        .search-container {
+            max-width: 600px;
+        }
+        
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 50px;
+            padding: 8px 8px 8px 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .search-wrapper:focus-within {
+            box-shadow: 0 4px 16px rgba(194, 107, 29, 0.2);
+        }
+        
+        .search-icon {
+            color: #999;
+            margin-right: 12px;
+        }
+        
+        .search-input-modern {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 8px 0;
+            font-size: 1rem;
+        }
+        
+        .search-btn-modern {
+            background: #c26b1d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-btn-modern:hover {
+            background: #8f542c;
+            transform: scale(1.05);
+        }
+        
+        /* Alert moderno */
+        .alert-modern {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        /* Grid de productos */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(194, 107, 29, 0.15);
+        }
+        
+        .product-image-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 75%; /* 4:3 aspect ratio */
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+        
+        .product-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover .product-image {
+            transform: scale(1.1);
+        }
+        
+        .product-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 1;
+        }
+        
+        .product-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        
+        .product-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .product-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: auto;
+        }
+        
+        .product-price {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .price-label {
+            font-size: 0.75rem;
+            color: #999;
+            text-transform: uppercase;
+        }
+        
+        .price-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #c26b1d;
+        }
+        
+        .btn-add-cart {
+            background: #c26b1d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .btn-add-cart:hover {
+            background: #8f542c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(194, 107, 29, 0.3);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 16px;
+            }
+            
+            .product-body {
+                padding: 16px;
+            }
+            
+            .product-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn-add-cart {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-chip {
+                font-size: 0.85rem;
+                padding: 10px 16px;
+            }
+        }
+        
+        /* Fix modal backdrop - permitir clicks en inputs */
+        .modal {
+            z-index: 1055 !important;
+        }
+        
+        .modal-backdrop {
+            z-index: 1050 !important;
+        }
+        
+        .modal-dialog {
+            z-index: 1056 !important;
+        }
+        
+        .modal-content {
+            position: relative;
+            z-index: 1057 !important;
+        }
+        
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+    </style>
 </head>
 
-<body>
+<body class="smooth-scroll d-flex flex-column min-vh-100">
     <!-- navbar -->
     <div th:replace="~{fragments/navbarUsuario :: navbarU}"></div>
 
     <!-- Contenido principal -->
-    <main>
-        <!-- Mensaje con SweetAlert2 se muestra via script al final -->
-        <!-- Sección de filtros de categoría -->
-        <section class="text-center my-4">
-            <div class="d-flex justify-content-center gap-3 flex-wrap">
-                <!-- Botón principal para mostrar/ocultar subcategorías -->
-                <a href="#" id="btn-menu-dia" class="btn-filtro rounded-pill">
-                    MENÚ DEL DÍA
+    <main class="container flex-grow-1 py-4">
+        <!-- Sección de filtros modernos -->
+        <section class="mb-5">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-dark mb-2">Nuestro Menú</h2>
+                <p class="text-muted">Selecciona una categoría para explorar</p>
+            </div>
+            
+            <div class="filter-container d-flex justify-content-center gap-3 flex-wrap mb-3">
+                <a href="#" id="btn-menu-dia" class="filter-chip">
+                    <i class="bi bi-calendar-day me-2"></i>Menú del Día
                 </a>
-
-                <!-- Otras categorías -->
-                <a class="btn-filtro rounded-pill filtro-general" th:href="@{/catalogo(categoria='Bebidas')}"
-                   th:classappend="${param.categoria} == 'Bebidas' ? ' activo' : ''">
-                    BEBIDAS
+                <a class="filter-chip filtro-general" th:href="@{/catalogo(categoria='Bebidas')}"
+                   th:classappend="${param.categoria} == 'Bebidas' ? ' active' : ''">
+                    <i class="bi bi-cup-straw me-2"></i>Bebidas
                 </a>
-                <a class="btn-filtro rounded-pill filtro-general" th:href="@{/catalogo(categoria='Snack')}"
-                   th:classappend="${param.categoria} == 'Snack' ? ' activo' : ''">
-                    SNACKS
+                <a class="filter-chip filtro-general" th:href="@{/catalogo(categoria='Snack')}"
+                   th:classappend="${param.categoria} == 'Snack' ? ' active' : ''">
+                    <i class="bi bi-bag-fill me-2"></i>Snacks
                 </a>
-                <a class="btn-filtro rounded-pill filtro-general" th:href="@{/catalogo(categoria='Postres')}"
-                   th:classappend="${param.categoria} == 'Postres' ? ' activo' : ''">
-                    POSTRES
+                <a class="filter-chip filtro-general" th:href="@{/catalogo(categoria='Postres')}"
+                   th:classappend="${param.categoria} == 'Postres' ? ' active' : ''">
+                    <i class="bi bi-cake2 me-2"></i>Postres
                 </a>
             </div>
 
             <!-- Subcategorías del menú del día -->
-            <div id="botones-menu-dia" class="d-none d-flex justify-content-center gap-3 mt-3 flex-wrap">
-                <a class="btn-filtro btn-menu-extra rounded-pill" th:href="@{/catalogo(categoria='MENU ECONOMICO')}"
-                   th:classappend="${param.categoria} == 'MENU ECONOMICO' ? ' activo' : ''">
+            <div id="botones-menu-dia" class="d-none justify-content-center gap-2 flex-wrap">
+                <a class="filter-chip-sm" th:href="@{/catalogo(categoria='MENU ECONOMICO')}"
+                   th:classappend="${param.categoria} == 'MENU ECONOMICO' ? ' active' : ''">
                     Económico
                 </a>
-                <a class="btn-filtro btn-menu-extra rounded-pill" th:href="@{/catalogo(categoria='MENU EJECUTIVO')}"
-                   th:classappend="${param.categoria} == 'MENU EJECUTIVO' ? ' activo' : ''">
+                <a class="filter-chip-sm" th:href="@{/catalogo(categoria='MENU EJECUTIVO')}"
+                   th:classappend="${param.categoria} == 'MENU EJECUTIVO' ? ' active' : ''">
                     Ejecutivo
                 </a>
-                <a class="btn-filtro btn-menu-extra rounded-pill" th:href="@{/catalogo(categoria='MENU UNIVERSITARIO')}"
-                   th:classappend="${param.categoria} == 'MENU UNIVERSITARIO' ? ' activo' : ''">
+                <a class="filter-chip-sm" th:href="@{/catalogo(categoria='MENU UNIVERSITARIO')}"
+                   th:classappend="${param.categoria} == 'MENU UNIVERSITARIO' ? ' active' : ''">
                     Universitario
                 </a>
             </div>
-
         </section>
 
-
-
-        <!-- Barra de búsqueda -->
-        <section class="container mb-4">
-            <form method="get" th:action="@{/catalogo}" class="d-flex justify-content-center search-form">
-                <input class="form-control me-2 search-input" type="search" name="busqueda"
-                       placeholder="¿Algo que se te antoje?" th:value="${busquedaActual}">
-                <input type="hidden" name="categoria" th:value="${categoriaActual}" />
-                <button class="btn btn-outline-primary search-btn" type="submit">Buscar</button>
+        <!-- Barra de búsqueda moderna -->
+        <section class="mb-5">
+            <form method="get" th:action="@{/catalogo}" class="search-container mx-auto">
+                <div class="search-wrapper">
+                    <i class="bi bi-search search-icon"></i>
+                    <input class="search-input-modern" type="search" name="busqueda"
+                           placeholder="Buscar productos..." th:value="${busquedaActual}">
+                    <input type="hidden" name="categoria" th:value="${categoriaActual}" />
+                    <button class="search-btn-modern" type="submit">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
             </form>
-            <!-- Mensaje si no se encuentra el producto -->
-            <div class="text-center mt-5" th:if="${noResultados}">
-                <div class="custom-alert d-inline-block px-4 py-3 shadow-sm rounded-4">
-                    <i class="bi bi-exclamation-circle me-2 fs-5"></i>
-                    Lo sentimos, no encontramos resultados para "<span th:text="${busquedaActual}"></span>".
-                    <br>
-                    <a th:href="@{/catalogo/}" class="btn custom-btn mt-3">Volver al menú general</a>
+            
+            <!-- Mensaje si no hay resultados -->
+            <div class="text-center mt-4" th:if="${noResultados}">
+                <div class="alert-modern">
+                    <i class="bi bi-emoji-frown fs-1 mb-3 d-block"></i>
+                    <h5>No encontramos resultados</h5>
+                    <p class="text-muted mb-3">No hay productos que coincidan con "<strong th:text="${busquedaActual}"></strong>"</p>
+                    <a th:href="@{/catalogo}" class="btn btn-primary rounded-pill">
+                        <i class="bi bi-arrow-left me-2"></i>Ver todo el menú
+                    </a>
                 </div>
             </div>
         </section>
 
-
-        <!-- Cards de productos -->
-        <div class="container mt-4">
-            <div class="row">
-                <div class="col-md-4 mb-4" th:each="producto : ${productos}">
-                    <div class="card h-100 shadow-sm">
-                        <img th:src="@{${producto.imagenUrl}}" class="card-img-top" alt="Imagen del producto"
-                             style="height: 200px; object-fit: cover;">
-                        <div class="card-body d-flex flex-column text-center">
-                            <h5 class="card-title" th:text="${producto.nombre}"></h5>
-                            <p class="card-text text-muted">S/. <span th:text="${producto.precio}"></span></p>
-                            <p class="card-text text-muted"> <span th:text="${producto.descripcion}"></span> </p>
-                            <button class="btn btn-success mt-auto"
-                                    th:attr="data-nombre=${producto.nombre}, data-description=${producto.descripcion} ,data-precio=${producto.precio},data-id=${producto.idProducto}"
-                                    onclick="abrirModal(this)">
-                                Ver detalle
-                            </button>
+        <!-- Grid de productos moderno -->
+        <div class="products-grid" th:if="${!noResultados}">
+            <div class="product-card" th:each="producto : ${productos}">
+                <div class="product-image-wrapper">
+                    <img th:src="@{${producto.imagenUrl}}" class="product-image" alt="Imagen del producto">
+                    <div class="product-badge" th:if="${producto.stock < 10}">
+                        <i class="bi bi-exclamation-circle me-1"></i>Pocas unidades
+                    </div>
+                </div>
+                <div class="product-body">
+                    <h5 class="product-title" th:text="${producto.nombre}">Nombre</h5>
+                    <p class="product-description" th:text="${producto.descripcion}">Descripción</p>
+                    <div class="product-footer">
+                        <div class="product-price">
+                            <span class="price-label">Precio</span>
+                            <span class="price-value">S/ <span th:text="${producto.precio}">0.00</span></span>
                         </div>
+                        <button class="btn-add-cart"
+                                th:attr="data-nombre=${producto.nombre}, data-description=${producto.descripcion}, data-precio=${producto.precio}, data-id=${producto.idProducto}"
+                                onclick="abrirModal(this)">
+                            <i class="bi bi-cart-plus me-2"></i>Agregar
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Paginación -->
-        <nav th:if="${totalPages > 1}">
+        <!-- Paginación moderna -->
+        <nav th:if="${totalPages > 1}" class="mt-5">
             <ul class="pagination justify-content-center">
                 <!-- Botón anterior -->
                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
@@ -145,7 +471,7 @@
                 <h2 id="modalNombre"></h2>
                 <p id="modalPrecio"></p>
                 <p id="modalDescription"></p>
-                <form method="post" th:action="@{/catalogo/subir}">
+                <form method="post" th:action="@{/catalogo/subir}" id="formAgregarCarrito">
                     <input type="hidden" id="idProducto" name="idProducto">
                     <input type="hidden" name="idUsuario" value="1" id="idUsuario">
                     <input type="hidden" name="nombreProducto" id="nombreProducto">
@@ -156,6 +482,80 @@
             </div>
         </div>
     </main>
+    
+    <!-- Footer con diseño UTP -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Columna 1: Logo y descripción -->
+                <div class="col-md-4">
+                    <h5 class="mb-3">
+                        <i class="bi bi-cup-hot-fill text-warning me-2"></i>
+                        Coffee UTPedidos
+                    </h5>
+                    <p class="text-white-50 small">
+                        La cafetería oficial de la Universidad Tecnológica del Perú. 
+                        Calidad y sabor en cada pedido.
+                    </p>
+                </div>
+                
+                <!-- Columna 2: Enlaces rápidos -->
+                <div class="col-md-4">
+                    <h6 class="mb-3">Enlaces Rápidos</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a th:href="@{/catalogo}" class="text-white-50 text-decoration-none">
+                                <i class="bi bi-grid-fill me-2"></i>Catálogo
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a th:href="@{/sobre-nosotros}" class="text-white-50 text-decoration-none">
+                                <i class="bi bi-info-circle-fill me-2"></i>Sobre Nosotros
+                            </a>
+                        </li>
+                        <li class="mb-2" sec:authorize="isAuthenticated()">
+                            <a th:href="@{/carrito}" class="text-white-50 text-decoration-none">
+                                <i class="bi bi-cart-fill me-2"></i>Mi Carrito
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Columna 3: Contacto -->
+                <div class="col-md-4">
+                    <h6 class="mb-3">Contacto</h6>
+                    <ul class="list-unstyled text-white-50 small">
+                        <li class="mb-2">
+                            <i class="bi bi-envelope-fill me-2"></i>
+                            cafeteria@utp.edu.pe
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-telephone-fill me-2"></i>
+                            (01) 315-9600
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-geo-alt-fill me-2"></i>
+                            UTP - Piso 2, Cafetería
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <hr class="my-4 bg-secondary">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-0 small text-white-50">
+                        &copy; 2025 Coffee UTPedidos - Universidad Tecnológica del Perú | Todos los derechos reservados
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Incluir modales de Login y Registro -->
+    <div th:replace="~{fragments/loginModal :: loginModal}"></div>
+    <div th:replace="~{fragments/loginModal :: registerModal}"></div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
@@ -174,7 +574,13 @@
         // Mostrar mensaje con SweetAlert2 si existe
         /*<![CDATA[*/
         const message = /*[[${message}]]*/ null;
+        const success = /*[[${success}]]*/ null;
+        const error = /*[[${error}]]*/ null;
+        const showLoginModal = /*[[${showLoginModal}]]*/ false;
+        const showRegisterModal = /*[[${showRegisterModal}]]*/ false;
+        const isAuthenticated = /*[[${#authorization.expression('isAuthenticated()')}]]*/ false;
         
+        // Mostrar mensajes
         if (message) {
             Swal.fire({
                 icon: 'success',
@@ -185,6 +591,93 @@
                 timerProgressBar: true
             });
         }
+        
+        if (success) {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Genial!',
+                text: success,
+                confirmButtonColor: '#0d6efd',
+                timer: 4000,
+                timerProgressBar: true
+            });
+        }
+        
+        if (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: error,
+                confirmButtonColor: '#dc3545'
+            });
+        }
+        
+        // Interceptar el envío del formulario de agregar al carrito
+        document.addEventListener('DOMContentLoaded', function() {
+            // Abrir modales automáticamente si es necesario
+            if (showLoginModal) {
+                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                loginModal.show();
+            }
+            
+            if (showRegisterModal) {
+                const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+                registerModal.show();
+            }
+            
+            const formAgregarCarrito = document.getElementById('formAgregarCarrito');
+            
+            if (formAgregarCarrito) {
+                formAgregarCarrito.addEventListener('submit', function(e) {
+                    // Si NO está autenticado, prevenir el envío y mostrar modal de login
+                    if (!isAuthenticated) {
+                        e.preventDefault();
+                        cerrarModal(); // Cerrar modal de producto
+                        
+                        Swal.fire({
+                            title: '¡Inicia sesión para continuar!',
+                            html: '<p class="mb-3">Necesitas una cuenta para agregar productos al carrito.</p>',
+                            icon: 'info',
+                            showCancelButton: true,
+                            confirmButtonColor: '#0d6efd',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: '<i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión',
+                            cancelButtonText: '<i class="bi bi-person-plus me-1"></i> Registrarse',
+                            reverseButtons: true,
+                            customClass: {
+                                confirmButton: 'btn btn-primary',
+                                cancelButton: 'btn btn-success'
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Abrir modal de login
+                                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                                loginModal.show();
+                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                // Abrir modal de registro
+                                const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+                                registerModal.show();
+                            }
+                        });
+                    }
+                    // Si está autenticado, dejar que el formulario se envíe normalmente
+                });
+            }
+            
+            // Smooth scroll para enlaces internos
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
         /*]]>*/
     </script>
 </body>

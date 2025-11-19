@@ -158,12 +158,15 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public UsuarioResponseDTO registrarUsuario(UsuarioRegistroDTO registroDTO) {
-        logger.info("Registrando nuevo usuario público: {}", registroDTO.getCorreo());
+        logger.info("Registrando nuevo estudiante: {} ({})", registroDTO.getNombre(), registroDTO.getCodigoEstudiantil());
         
-        // Validar que el correo no exista
-        if (usuarioRepository.existsByCorreo(registroDTO.getCorreo())) {
-            throw new IllegalArgumentException("Ya existe una cuenta con ese correo");
+        // Validar que el código estudiantil no exista
+        if (usuarioRepository.existsByCodigoEstudiantil(registroDTO.getCodigoEstudiantil())) {
+            throw new IllegalArgumentException("Ya existe una cuenta con ese código estudiantil");
         }
+        
+        // El correo se genera automáticamente: codigoEstudiantil@utp.edu.pe
+        // No necesita validación adicional porque el código ya es único
         
         // Validar que las contraseñas coincidan
         if (!registroDTO.getPassword().equals(registroDTO.getConfirmarPassword())) {
@@ -179,7 +182,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         // Guardar
         Usuario guardado = usuarioRepository.save(usuario);
         
-        logger.info("Usuario registrado exitosamente con ID: {}", guardado.getIdUsuario());
+        logger.info("Estudiante registrado exitosamente - ID: {}, Código: {}", 
+                   guardado.getIdUsuario(), guardado.getCodigoEstudiantil());
         return usuarioMapper.toResponseDTO(guardado);
     }
 
