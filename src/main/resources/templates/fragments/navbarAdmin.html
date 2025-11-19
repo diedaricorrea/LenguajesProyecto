@@ -2,10 +2,15 @@
 <html lang="es" xmlns:th="https://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
+<head>
+    <!-- Admin Theme CSS -->
+    <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
+</head>
+
 <body>
 
     <!-- Barra lateral -->
-    <div th:fragment="navbarA(activeTab)" class="sidebar">
+    <div th:fragment="navbarA(activeTab)" class="sidebar sidebar-admin">
         <div class="sidebar-header">
             <h3>UTPedidos</h3>
             <p>Panel de Administración</p>
@@ -63,14 +68,14 @@
             <!-- Catálogo - Siempre visible (para usuarios sin permisos admin) -->
             <li class="nav-item" sec:authorize="isAuthenticated()">
                 <a class="nav-link" th:href="@{/catalogo}">
-                    <i class="bi bi-shop"></i>Catálogo
+                    <i class="bi bi-shop me-2"></i>Catálogo
                 </a>
             </li>
             
-            <!-- Salir - Siempre visible -->
+            <!-- Logout - Siempre visible -->
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/login/medio}">
-                    <i class="bi bi-box-arrow-right"></i>Salir
+                <a class="nav-link" th:href="@{/logout}">
+                    <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
                 </a>
             </li>
         </ul>

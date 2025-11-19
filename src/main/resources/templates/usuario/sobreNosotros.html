@@ -251,6 +251,24 @@
             z-index: 1057 !important;
         }
         
+        /* Remover outline y efecto azul de Bootstrap */
+        .btn:focus,
+        .btn:active,
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-outline-primary:focus,
+        .btn-outline-primary:active {
+            outline: none !important;
+            box-shadow: none !important;
+            border-color: var(--primary-brown) !important;
+        }
+        
+        .btn-primary:active,
+        .btn-primary.active {
+            background-color: var(--dark-brown) !important;
+            border-color: var(--dark-brown) !important;
+        }
+        
         /* Fix footer al final */
         html, body {
             height: 100%;
