@@ -50,16 +50,24 @@ public class LoginController {
      */
     @GetMapping("/login2")
     public String redirectPorRol(Authentication authentication) {
-        String rol = authentication.getAuthorities().iterator().next().getAuthority();
+        // Buscar el rol (authority que empieza con ROLE_)
+        String rol = authentication.getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .filter(auth -> auth.startsWith("ROLE_"))
+                .findFirst()
+                .orElse("ROLE_USUARIO");
         
         logger.info("Usuario autenticado con rol: {}", rol);
+        logger.debug("Todas las autoridades: {}", authentication.getAuthorities());
         
-        return switch (rol) {
-            case "ROLE_ADMINISTRADOR" -> "redirect:/login/medio";
-            case "ROLE_TRABAJADOR" -> "redirect:/login/medio";
-            case "ROLE_USUARIO" -> "redirect:/catalogo";
-            default -> "login/login";
-        };
+        // Si tiene rol USUARIO (del catálogo público), va al catálogo
+        if (rol.equals("ROLE_USUARIO")) {
+            return "redirect:/catalogo";
+        }
+        
+        // Cualquier otro rol (ADMINISTRADOR, TRABAJADOR, roles personalizados) va al panel medio
+        // El panel medio redirigirá según sus permisos
+        return "redirect:/login/medio";
     }
 
     /**

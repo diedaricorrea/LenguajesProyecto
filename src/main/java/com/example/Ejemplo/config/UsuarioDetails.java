@@ -3,6 +3,7 @@ package com.example.Ejemplo.config;
 import com.example.Ejemplo.models.Usuario;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Slf4j
 public class UsuarioDetails implements UserDetails {
     private Usuario usuario;
 
@@ -31,19 +33,32 @@ public class UsuarioDetails implements UserDetails {
         
         // Agregar el rol como autoridad (ROLE_ADMINISTRADOR, ROLE_USUARIO, etc.)
         if (usuario.getRolEntity() != null) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + usuario.getRolEntity().getNombre()));
+            String roleName = "ROLE_" + usuario.getRolEntity().getNombre();
+            authorities.add(new SimpleGrantedAuthority(roleName));
+            log.debug("🔑 Usuario '{}' tiene rol: {}", usuario.getCorreo(), roleName);
             
             // Agregar cada permiso como autoridad
             if (usuario.getRolEntity().getPermisos() != null) {
-                authorities.addAll(
-                    usuario.getRolEntity().getPermisos().stream()
+                List<GrantedAuthority> permisos = usuario.getRolEntity().getPermisos().stream()
                         .map(permiso -> new SimpleGrantedAuthority(permiso.getNombre()))
-                        .collect(Collectors.toList())
-                );
+                        .collect(Collectors.toList());
+                
+                authorities.addAll(permisos);
+                log.info("✅ Usuario '{}' cargado con {} permisos: {}", 
+                        usuario.getCorreo(), 
+                        permisos.size(),
+                        permisos.stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(", ")));
+            } else {
+                log.warn("⚠️ Usuario '{}' con rol '{}' pero SIN permisos asignados", 
+                        usuario.getCorreo(), usuario.getRolEntity().getNombre());
             }
         } else if (usuario.getRol() != null) {
             // Fallback al enum Rol para compatibilidad
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + usuario.getRol().toString()));
+            String roleName = "ROLE_" + usuario.getRol().toString();
+            authorities.add(new SimpleGrantedAuthority(roleName));
+            log.warn("🔄 Usuario '{}' usando rol ENUM (legacy): {}", usuario.getCorreo(), roleName);
+        } else {
+            log.error("❌ Usuario '{}' SIN ROL asignado!", usuario.getCorreo());
         }
         
         return authorities;
@@ -57,5 +72,30 @@ public class UsuarioDetails implements UserDetails {
     @Override
     public String getUsername() {
         return usuario.getCorreo();
+    }
+    
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // Las cuentas no expiran
+    }
+    
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // Las cuentas no se bloquean
+    }
+    
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // Las credenciales no expiran
+    }
+    
+    @Override
+    public boolean isEnabled() {
+        // Verificar que el usuario esté activo
+        boolean activo = usuario.isEstado();
+        if (!activo) {
+            log.warn("🚫 Usuario '{}' está INACTIVO - Login denegado", usuario.getCorreo());
+        }
+        return activo;
     }
 }

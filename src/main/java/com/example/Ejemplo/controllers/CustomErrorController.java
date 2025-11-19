@@ -21,37 +21,45 @@ public class CustomErrorController implements ErrorController {
         String requestUri = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
         
         // Log detallado del error
-        log.error("Error detectado - Status: {}, URI: {}, Message: {}, Exception: {}", 
-                 status, requestUri, message, exception);
+        log.error("❌ Error detectado - Status: {}, URI: {}, Message: {}", 
+                 status, requestUri, message);
+        
+        if (exception != null) {
+            log.error("Excepción: {}", exception.getClass().getName());
+        }
         
         if (status != null) {
             int statusCode = Integer.parseInt(status.toString());
             
-            // Agregar información al modelo para debugging
+            // Agregar información al modelo
             model.addAttribute("statusCode", statusCode);
-            model.addAttribute("requestUri", requestUri);
-            model.addAttribute("errorMessage", message);
+            model.addAttribute("requestUri", requestUri != null ? requestUri : "Desconocida");
+            model.addAttribute("errorMessage", message != null ? message.toString() : "Sin mensaje");
             
             if (statusCode == HttpStatus.FORBIDDEN.value()) {
+                log.warn("🚫 403 FORBIDDEN - Acceso denegado a: {}", requestUri);
+                model.addAttribute("mensaje", "No tienes permisos para acceder a esta página");
                 return "error/403";
             }
             
             if (statusCode == HttpStatus.NOT_FOUND.value()) {
-                log.warn("404 - Página no encontrada: {}", requestUri);
+                log.warn("🔍 404 NOT FOUND - Página no encontrada: {}", requestUri);
                 model.addAttribute("mensaje", "La página que buscas no existe");
                 return "error/error";
             }
             
             if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
-                log.error("500 - Error interno del servidor en: {}", requestUri);
+                log.error("🔥 500 ERROR - Error interno del servidor en: {}", requestUri);
                 if (exception != null) {
-                    log.error("Excepción: ", (Exception) exception);
+                    log.error("Excepción completa: ", (Exception) exception);
                 }
                 model.addAttribute("mensaje", "Error interno del servidor");
                 return "error/error";
             }
         }
         
+        log.warn("⚠️ Error genérico sin código de estado");
+        model.addAttribute("mensaje", "Ha ocurrido un error inesperado");
         return "error/error";
     }
 }
