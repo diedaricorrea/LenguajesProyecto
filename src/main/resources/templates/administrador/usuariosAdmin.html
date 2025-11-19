@@ -25,41 +25,68 @@
 
         <!-- Contenido principal -->
         <main class="container main-content">
-        <h1>Gestion de Usuarios</h1>
+            
+        
         <div>
-            <h2>Acciones</h2>
+            <div class="mb-3">
+                <h2><i class="bi bi-person me-2 text-primary"></i>Gestion de Usuarios</h2>
+                <p class="text-muted mb-0">Administra los usuarios registrados</p>
+            </div>
             <!-- Mensaje con SweetAlert2 se muestra via script al final -->
             <!-- Barra de acciones-->
-            <div class="container p-6  d-flex gap-3">
-                <!-- Modal de agregar-->
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregar">Agregar nuevo usuario</button>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row justify-content-center">
+                        <div class="col-md-4 mb-2 mb-md-0">
+                            <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#agregar">Agregar
+                            usuario</button>
+                        </div>
+                        <!--barra de busqueda-->
+                        <div class="col-md-6 mb-2 mb-md-0">
+                            <form th:action="@{/usuarios/search}" method="GET" class=" input-group">
+                                <input type="text" class="form-control" placeholder="Buscar" name="id" id="id">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </form>
+                            <div class="text-danger justify-content-center" th:if="${errorId}">Error el id no puede estar vacio</div>
+                        </div>
+                        <div class="col-md-1 text-center mb-2 mb-md-0">
+                             <a th:href="@{/usuarios/panelAdmin}" class=" btn btn-primary w-80"><i class="fa-solid fa-rotate-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal de agregar usuario-->
                 <div class="modal fade" id="agregar" tabindex="-1" aria-labelledby="tituloModal" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
-
+                
                             <!-- Encabezado del modal -->
-                            <div class="modal-header">
+                            <div class="modal-header bg-primary text-white">
                                 <h5 class="modal-title" id="tituloModal">Agregar nuevo usuario</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                             </div>
-
+                
                             <!-- Formulario -->
                             <form id="agregarUsuario" th:object="${usuario}" th:action="@{/usuarios/save}" method="POST">
                                 <div class="modal-body">
-
+                
                                     <!-- Nombre -->
                                     <div class="mb-3">
                                         <label for="nombre" class="form-label">Nombre de usuario</label>
-                                        <input type="text" th:field="*{nombre}" name="nombre" id="nombre" class="form-control" placeholder="Ingrese el nombre" required>
-                                        <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}">Error</div>
+                                        <input type="text" th:field="*{nombre}" name="nombre" id="nombre" class="form-control"
+                                            placeholder="Ingrese el nombre" required>
+                                        <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}">Error
+                                        </div>
                                     </div>
-
+                
                                     <!-- Correo -->
                                     <div class="mb-3">
                                         <label for="correo" class="form-label">Correo electrónico</label>
-                                        <input type="email" th:field="*{correo}" name="correo" id="correo" class="form-control" placeholder="ejemplo@correo.com" required>
+                                        <input type="email" th:field="*{correo}" name="correo" id="correo" class="form-control"
+                                            placeholder="ejemplo@correo.com" required>
                                     </div>
-
+                
                                     <!-- Rol -->
                                     <div class="mb-3">
                                         <label for="roles" class="form-label">Rol</label>
@@ -69,32 +96,34 @@
                                             <option value="ADMINISTRADOR">ADMINISTRADOR</option>
                                         </select>
                                     </div>
-
+                
                                     <!-- Contraseña -->
                                     <div class="mb-3">
                                         <label for="password" class="form-label">Contraseña</label>
-                                        <input type="password" th:field="*{password}" name="password" id="password" class="form-control" placeholder="********" required>
+                                        <input type="password" th:field="*{password}" name="password" id="password" class="form-control"
+                                            placeholder="********" required>
                                     </div>
-
+                
                                 </div>
-
+                
                                 <!-- Pie del modal -->
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                                     <button type="submit" class="btn btn-primary">Guardar cambios</button>
                                 </div>
                             </form>
-
+                
                         </div>
                     </div>
                 </div>
+                
 
 <!--                modal de actualizar usuario-->
                 <div class="modal fade" id="actualizar" tabindex="-1" aria-labelledby="tituloModal" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <form th:action="@{/usuarios/update}"  method="post">
-                                <div class="modal-header">
+                                <div class="modal-header bg-warning text-white">
                                     <h5 class="modal-title" id="tituloModal">Actualizar Usuario</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                                 </div>
@@ -128,52 +157,53 @@
                         </div>
                     </div>
                 </div>
-
-                <!--barra de busqueda-->
-                <div class="">
-                    <form th:action="@{/usuarios/search}"  method="GET" class="d-flex gap-3 form-control  ">
-                        <input type="text" class="form-control" placeholder="Buscar" name="id" id="id">
-                        <div class="text-danger" th:if="${errorId}">Error el id no puede estar vacio</div>
-                        <button type="submit" class="btn btn-primary">buscar</button>
-                    </form>
-
-                </div>
-                <a th:href="@{/usuarios/panelAdmin}" class="fs-4 btn btn-primary"><i class="fa-solid fa-arrows-rotate"></i></a>
             </div>
 
         </div>
 
-        <table class="table table-responsive mt-3   ">
-            <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Rol</th>
-                <th>Fecha de ingreso</th>
-                <th>Estado</th>
-                <th>Opciones</th>
-            </tr>
-            </thead>
-            <tbody>
-                <tr th:each="usuario : ${usuarios}">
-                    <td th:text="${usuario.idUsuario}"></td>
-                    <td th:text="${usuario.nombre}"></td>
-                    <td th:text="${usuario.correo}"></td>
-                    <td th:text="${usuario.rol}"></td>
-                    <td th:text="${usuario.fechaIngreso}"></td>
-                    <td th:text="${usuario.estado ? 'TRABAJA' : 'NO TRABAJA'}"></td>
-                    <td>
-                        <button class="btn btn-primary btn-actualizar"
-                                type="button"
-                                data-bs-toggle="modal"
-                                data-bs-target="#actualizar">
-                            Actualizar
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-list-ul"></i>
+                    Lista de Usuarios
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead class="text-center">
+                            <tr>
+                                <th>Id</th>
+                                <th>Nombre</th>
+                                <th>Correo</th>
+                                <th>Rol</th>
+                                <th>Fecha de ingreso</th>
+                                <th>Estado</th>
+                                <th>Opciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center">
+                            <tr th:each="usuario : ${usuarios}">
+                                <td th:text="${usuario.idUsuario}"></td>
+                                <td th:text="${usuario.nombre}"></td>
+                                <td th:text="${usuario.correo}"></td>
+                                <td th:text="${usuario.rol}"></td>
+                                <td th:text="${#temporals.format(usuario.fechaIngreso, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${usuario.estado ? 'TRABAJA' : 'NO TRABAJA'}"></td>
+                                <td>
+                                    <button class="btn btn-primary btn-actualizar" type="button" data-bs-toggle="modal"
+                                        data-bs-target="#actualizar">
+                                        Actualizar
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+        
     </main>
     </div>
 

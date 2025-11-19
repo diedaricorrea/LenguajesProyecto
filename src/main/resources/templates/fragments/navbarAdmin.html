@@ -24,7 +24,7 @@
             </li>
             <li class="nav-item" th:if="${usuarioAdmins == 'ADMINISTRADOR'}">
                 <a class="nav-link" th:classappend="${activeTab == 'usuarios' ? 'active' : ''}" th:href="@{/usuarios/panelAdmin}"><i
-                        class="fas fa-cog me-2"></i>Usuarios</a>
+                        class="bi bi-person me-2"></i>Usuarios</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:classappend="${activeTab == 'menuDia' ? 'active' : ''}" th:href="@{/menuDia/}"><i
