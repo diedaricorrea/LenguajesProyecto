@@ -10,6 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,6 +85,22 @@ public class PedidosServiceImpl implements PedidosService {
     @Override
     public Map<EstadoPedido, List<PedidoDTO>> agruparPedidosPorEstado() {
         List<Pedido> pedidos = obtenerTodosPedidos();
+        List<PedidoDTO> pedidosDTO = pedidoMapper.toDTOList(pedidos);
+        
+        return pedidosDTO.stream()
+                .collect(Collectors.groupingBy(
+                        PedidoDTO::getEstado,
+                        () -> new EnumMap<>(EstadoPedido.class),
+                        Collectors.toList()
+                ));
+    }
+    
+    @Override
+    public Map<EstadoPedido, List<PedidoDTO>> agruparPedidosPorEstadoYFecha(LocalDate fechaInicio, LocalDate fechaFin) {
+        LocalDateTime inicio = fechaInicio.atStartOfDay();
+        LocalDateTime fin = fechaFin.atTime(LocalTime.MAX);
+        
+        List<Pedido> pedidos = pedidosRepository.findByFechaPedidoBetween(inicio, fin);
         List<PedidoDTO> pedidosDTO = pedidoMapper.toDTOList(pedidos);
         
         return pedidosDTO.stream()

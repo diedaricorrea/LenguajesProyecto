@@ -39,10 +39,8 @@
               Gestión de Pedidos
             </h2>
             <p class="text-muted mb-0">
-              <span th:text="${totalPedidos != null ? totalPedidos : 0}"
-                >0</span
-              >
-              pedidos totales
+              <span th:text="${periodoTexto != null ? periodoTexto : 'Todos los pedidos'}">Todos los pedidos</span>
+              - <strong><span th:text="${totalPedidos != null ? totalPedidos : 0}">0</span> pedidos</strong>
             </p>
           </div>
           <div class="d-flex gap-2">
@@ -50,29 +48,143 @@
             <a th:href="@{/admin/pedidos}" class="btn btn-outline-primary">
               <i class="bi bi-arrow-clockwise"></i> Actualizar
             </a>
-            <!-- Búsqueda por código -->
-            <form
-              th:action="@{/admin/pedidos/buscar}"
-              method="post"
-              class="d-flex gap-2 flex-fill"
-            >
-              <input
-                type="text"
-                name="codigo"
-                class="form-control"
-                placeholder="Buscar por código..."
-                required
-                pattern="[A-Z]{3}[0-9]{3}"
-                title="Formato: ABC123"
-              />
-              <button
-                type="submit"
-                class="btn btn-primary"
-                style="min-width: 110px"
-              >
-                <i class="bi bi-search"></i> Buscar
-              </button>
-            </form>
+          </div>
+        </div>
+
+        <!-- Filtros de fecha y búsqueda -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="row g-3">
+              <!-- Filtros rápidos -->
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-calendar3"></i> Filtros rápidos
+                </label>
+                <div class="btn-group w-100" role="group">
+                  <a th:href="@{/admin/pedidos(filtro='hoy')}" 
+                     class="btn btn-outline-secondary"
+                     th:classappend="${filtroActivo == 'hoy' ? 'active' : ''}">
+                    <i class="bi bi-calendar-day"></i> Hoy
+                  </a>
+                  <a th:href="@{/admin/pedidos(filtro='semana')}" 
+                     class="btn btn-outline-secondary"
+                     th:classappend="${filtroActivo == 'semana' ? 'active' : ''}">
+                    <i class="bi bi-calendar-week"></i> Esta semana
+                  </a>
+                  <a th:href="@{/admin/pedidos(filtro='mes')}" 
+                     class="btn btn-outline-secondary"
+                     th:classappend="${filtroActivo == 'mes' ? 'active' : ''}">
+                    <i class="bi bi-calendar-month"></i> Este mes
+                  </a>
+                  <a th:href="@{/admin/pedidos}" 
+                     class="btn btn-outline-secondary"
+                     th:classappend="${filtroActivo == null && fechaInicio == null ? 'active' : ''}">
+                    <i class="bi bi-infinity"></i> Todo
+                  </a>
+                </div>
+              </div>
+
+              <!-- Búsqueda por código -->
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-search"></i> Buscar por código
+                </label>
+                <form th:action="@{/admin/pedidos/buscar}" method="post" class="d-flex gap-2">
+                  <input
+                    type="text"
+                    name="codigo"
+                    class="form-control"
+                    placeholder="Formato: ABC123"
+                    required
+                    pattern="[A-Z]{3}[0-9]{3}"
+                    title="Formato: ABC123"
+                  />
+                  <button type="submit" class="btn btn-primary" style="min-width: 110px;">
+                    <i class="bi bi-search"></i> Buscar
+                  </button>
+                </form>
+              </div>
+
+              <!-- Rango personalizado -->
+              <div class="col-12">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-calendar-range"></i> Rango personalizado
+                </label>
+                <form th:action="@{/admin/pedidos}" method="get" class="row g-2">
+                  <div class="col-md-5">
+                    <input
+                      type="date"
+                      name="fechaInicio"
+                      class="form-control"
+                      placeholder="Fecha inicio"
+                      th:value="${fechaInicio}"
+                    />
+                  </div>
+                  <div class="col-md-5">
+                    <input
+                      type="date"
+                      name="fechaFin"
+                      class="form-control"
+                      placeholder="Fecha fin"
+                      th:value="${fechaFin}"
+                    />
+                  </div>
+                  <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                      <i class="bi bi-funnel"></i> Filtrar
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estadísticas del período -->
+        <div class="row mb-4" th:if="${totalVentas != null}">
+          <div class="col-md-3">
+            <div class="card text-center">
+              <div class="card-body">
+                <h6 class="text-muted mb-2">
+                  <i class="bi bi-cash-stack"></i> Total Ventas
+                </h6>
+                <h3 class="mb-0">
+                  S/ <span th:text="${#numbers.formatDecimal(totalVentas, 1, 2)}">0.00</span>
+                </h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center">
+              <div class="card-body">
+                <h6 class="text-muted mb-2">
+                  <i class="bi bi-check-circle"></i> Completados
+                </h6>
+                <h3 class="mb-0 text-success" th:text="${pedidosCompletados}">0</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center">
+              <div class="card-body">
+                <h6 class="text-muted mb-2">
+                  <i class="bi bi-x-circle"></i> Cancelados
+                </h6>
+                <h3 class="mb-0 text-danger" th:text="${pedidosCanceladosCount}">0</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center">
+              <div class="card-body">
+                <h6 class="text-muted mb-2">
+                  <i class="bi bi-graph-up"></i> Promedio
+                </h6>
+                <h3 class="mb-0">
+                  S/ <span th:text="${#numbers.formatDecimal(promedioVenta, 1, 2)}">0.00</span>
+                </h3>
+              </div>
+            </div>
           </div>
         </div>
 

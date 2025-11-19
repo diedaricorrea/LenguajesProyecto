@@ -4,6 +4,7 @@ import com.example.Ejemplo.dto.PedidoDTO;
 import com.example.Ejemplo.models.EstadoPedido;
 import com.example.Ejemplo.models.Pedido;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public interface PedidosService {
     
     // Métodos de agrupación y conversión
     Map<EstadoPedido, List<PedidoDTO>> agruparPedidosPorEstado();
+    Map<EstadoPedido, List<PedidoDTO>> agruparPedidosPorEstadoYFecha(LocalDate fechaInicio, LocalDate fechaFin);
     List<PedidoDTO> convertirPedidosADTO(List<Pedido> pedidos);
     
     // Métodos de gestión de estados

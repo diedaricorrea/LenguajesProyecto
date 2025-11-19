@@ -1,13 +1,17 @@
 package com.example.Ejemplo.controllers;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.example.Ejemplo.config.UsuarioDetails;
 import com.example.Ejemplo.dto.UsuarioRegistroDTO;
 import com.example.Ejemplo.models.Carrito;
+import com.example.Ejemplo.models.MenuDia;
 import com.example.Ejemplo.models.Producto;
 import com.example.Ejemplo.models.Usuario;
 import com.example.Ejemplo.services.impl.CarritoServiceImpl;
+import com.example.Ejemplo.services.impl.MenuDiaServiceImpl;
 import com.example.Ejemplo.services.impl.NotificacionServiceImpl;
 import com.example.Ejemplo.services.impl.ProductoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +38,18 @@ public class ProductoController {
     private final CarritoServiceImpl carritoServiceImpl;
 
     private final NotificacionServiceImpl notificacionServiceImpl;
+    
+    private final MenuDiaServiceImpl menuDiaServiceImpl;
 
     @Autowired
-    public ProductoController(ProductoServiceImpl productosServiceImpl, CarritoServiceImpl carritoServiceImpl, NotificacionServiceImpl notificacionServiceImpl) {
+    public ProductoController(ProductoServiceImpl productosServiceImpl, 
+                             CarritoServiceImpl carritoServiceImpl, 
+                             NotificacionServiceImpl notificacionServiceImpl,
+                             MenuDiaServiceImpl menuDiaServiceImpl) {
         this.productosServiceImpl = productosServiceImpl;
         this.carritoServiceImpl = carritoServiceImpl;
         this.notificacionServiceImpl = notificacionServiceImpl;
+        this.menuDiaServiceImpl = menuDiaServiceImpl;
     }
 
     @GetMapping()
@@ -61,6 +71,13 @@ public class ProductoController {
             model.addAttribute("usuarioAdmins", "INVITADO");
             model.addAttribute("usuarioNombre", "Invitado");
         }
+        
+        // Obtener menús del día HOY
+        List<MenuDia> menusHoy = menuDiaServiceImpl.findMenusDelDia(LocalDate.now());
+        List<Producto> productosMenuDelDia = menusHoy.stream()
+                .map(MenuDia::getProducto)
+                .collect(Collectors.toList());
+        model.addAttribute("menusDelDia", productosMenuDelDia);
         
         // Agregar objeto para el formulario de registro (modales)
         if (!model.containsAttribute("usuarioRegistro")) {

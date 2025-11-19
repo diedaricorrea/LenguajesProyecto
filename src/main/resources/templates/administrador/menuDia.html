@@ -6,17 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menú del Día - UTPedidos</title>
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" 
-          integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" 
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <!-- Admin Theme CSS -->
     <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
@@ -28,75 +25,276 @@
         <div th:replace="~{fragments/navbarAdmin :: navbarA('menuDia')}"></div>
 
         <!-- Contenido principal -->
-        <main class="container main-content">
-    <h1>Menu del dia</h1>
-    <h3>Menus Economicos</h3>
-    <!-- Cards de productos -->
-    <div class="container mt-4">
-        <div class="row ">
-            <div class="col-md-4 mb-4" th:each="menu : ${menusEconomicos}">
-                <div class="card w-75 h-100 shadow-sm">
-                    <img th:src="@{${menu.getImagenUrl()}}" class="card-img-top" alt="Imagen del producto"
-                         style="height: 200px; object-fit: cover;">
-                    <div class="card-body d-flex flex-column text-center">
-                        <h5 class="card-title" th:text="${menu.nombre}"></h5>
-                        <p class="card-text text-muted">S/. <span th:text="${menu.getPrecio()}"></span></p>
-                    </div>
-                    <button class="btn btn-outline-primary"
-                            th:attr="data-nombre=${menu.nombre}, data-precio=${menu.getPrecio()},data-id=${menu.getIdProducto()}"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalFecha">
-                        Agregar Dia de venta
-                    </button>
+        <main class="container-fluid main-content">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="bi bi-calendar-day text-primary"></i> Menú del Día
+                    </h2>
+                    <p class="text-muted mb-0">Programa los menús económicos disponibles por fecha</p>
                 </div>
             </div>
-        </div>
+
+            <!-- Menús de HOY destacados -->
+            <div class="card bg-light border-primary mb-4" th:if="${menusHoy != null && !menusHoy.isEmpty()}">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-star-fill"></i> Menús Disponibles HOY
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3" th:each="menu : ${menusHoy}">
+                            <div class="card h-100 border-primary">
+                                <div class="card-body">
+                                    <h6 class="card-title" th:text="${menu.producto.nombre}">Producto</h6>
+                                    <p class="mb-1">
+                                        <strong>Precio:</strong> S/ <span th:text="${#numbers.formatDecimal(menu.producto.precio, 1, 2)}">0.00</span>
+                                    </p>
+                                    <p class="mb-0 text-muted small">
+                                        <i class="bi bi-clock"></i>
+                                        <span th:text="${#temporals.format(menu.fecha, 'HH:mm')}">00:00</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs: Programar vs Ver Programados -->
+            <ul class="nav nav-tabs mb-4" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="programar-tab" data-bs-toggle="tab" 
+                            data-bs-target="#programar" type="button">
+                        <i class="bi bi-plus-circle"></i> Programar Menú
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="programados-tab" data-bs-toggle="tab" 
+                            data-bs-target="#programados" type="button">
+                        <i class="bi bi-list-check"></i> Menús Programados
+                        <span class="badge bg-primary ms-2" th:text="${menusProgramados != null ? menusProgramados.size() : 0}">0</span>
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Tab: Programar Menú -->
+                <div class="tab-pane fade show active" id="programar">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Selecciona un Producto para Programar como Menú del Día</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Mensaje si no hay productos -->
+                            <div class="alert alert-info" th:if="${menusEconomicos == null || menusEconomicos.isEmpty()}">
+                                <i class="bi bi-info-circle"></i> No hay productos disponibles. 
+                                <a th:href="@{/administrador/productoFormulario}" class="alert-link">Crear nuevo producto</a>
+                            </div>
+                            
+                            <div class="row" th:if="${menusEconomicos != null && !menusEconomicos.isEmpty()}">
+                                <div class="col-md-4 mb-4" th:each="menu : ${menusEconomicos}">
+                                    <div class="card h-100 shadow-sm">
+                                        <img th:src="@{${menu.imagenUrl}}" 
+                                             class="card-img-top" 
+                                             alt="Imagen del producto"
+                                             style="height: 200px; object-fit: cover;"
+                                             onerror="this.src='/imagenes/imagenpordefecto.png'">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title" th:text="${menu.nombre}">Producto</h5>
+                                            <p class="card-text">
+                                                <strong class="text-primary">S/ <span th:text="${#numbers.formatDecimal(menu.precio, 1, 2)}">0.00</span></strong>
+                                            </p>
+                                            <p class="card-text text-muted small" th:text="${menu.descripcion}">Descripción</p>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <button class="btn btn-primary w-100"
+                                                    th:attr="data-nombre=${menu.nombre}, 
+                                                            data-precio=${menu.precio},
+                                                            data-id=${menu.idProducto}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalFecha">
+                                                <i class="bi bi-calendar-plus"></i> Programar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Menús Programados -->
+                <div class="tab-pane fade" id="programados">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Lista de Menús Programados</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Producto</th>
+                                            <th>Precio</th>
+                                            <th>Fecha Programada</th>
+                                            <th>Hora</th>
+                                            <th>Estado</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:if="${menusProgramados == null || menusProgramados.isEmpty()}">
+                                            <td colspan="7" class="text-center text-muted py-4">
+                                                <i class="bi bi-inbox fs-1"></i>
+                                                <p>No hay menús programados</p>
+                                            </td>
+                                        </tr>
+                                        <tr th:each="menu, iter : ${menusProgramados}">
+                                            <td th:text="${iter.count}">1</td>
+                                            <td>
+                                                <strong th:text="${menu.producto.nombre}">Producto</strong>
+                                            </td>
+                                            <td>
+                                                S/ <span th:text="${#numbers.formatDecimal(menu.producto.precio, 1, 2)}">0.00</span>
+                                            </td>
+                                            <td th:text="${#temporals.format(menu.fecha, 'dd/MM/yyyy')}">01/01/2025</td>
+                                            <td th:text="${#temporals.format(menu.fecha, 'HH:mm')}">00:00</td>
+                                            <td>
+                                                <span th:if="${#temporals.createNow().isBefore(menu.fecha)}" 
+                                                      class="badge bg-info">
+                                                    <i class="bi bi-clock"></i> Programado
+                                                </span>
+                                                <span th:if="${#temporals.createNow().isAfter(menu.fecha)}" 
+                                                      class="badge bg-secondary">
+                                                    <i class="bi bi-check"></i> Pasado
+                                                </span>
+                                                <span th:if="${#temporals.format(menu.fecha, 'yyyy-MM-dd') == #temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" 
+                                                      class="badge bg-success">
+                                                    <i class="bi bi-star"></i> HOY
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <form th:action="@{/menuDia/{id}/eliminar(id=${menu.id})}" 
+                                                      method="post" 
+                                                      style="display: inline;"
+                                                      onsubmit="return confirm('¿Estás seguro de eliminar este menú programado?');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <!-- Modal para seleccionar una fecha -->
+    <!-- Modal para seleccionar fecha -->
     <div class="modal fade" id="modalFecha" tabindex="-1" aria-labelledby="modalFechaLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalFechaLabel">Seleccionar fecha</h5>
+                    <h5 class="modal-title" id="modalFechaLabel">
+                        <i class="bi bi-calendar-plus"></i> Programar Menú del Día
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
                 <form method="POST" th:object="${menuDia}" th:action="@{/menuDia/guardar}">
                     <div class="modal-body">
+                        <div class="alert alert-info">
+                            <strong id="modalNombre"></strong>
+                            <p class="mb-0">Precio: <strong>S/ <span id="modalPrecio"></span></strong></p>
+                        </div>
+                        
+                        <input type="hidden" id="modalId" name="producto.idProducto">
+                        
                         <div class="mb-3">
-                            <input hidden type="text" id ="modalId" name="producto.id" >
-                            <label id="modalNombre" class="form-control"></label>
-                            <label id="modalPrecio" class="form-control"></label>
-                            <label for="fecha" class="form-label">Fecha:</label>
-                            <input type="datetime-local" class="form-control"
+                            <label for="fecha" class="form-label fw-semibold">
+                                <i class="bi bi-calendar3"></i> Fecha y Hora de Disponibilidad
+                            </label>
+                            <input type="datetime-local" 
+                                   class="form-control"
                                    id="fecha"
                                    name="fecha"
-                                   th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd HH:mm')}"
                                    required>
+                            <small class="text-muted">
+                                El menú estará disponible a partir de esta fecha y hora
+                            </small>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Guardar fecha</button>
-                    </div+>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Programar
+                        </button>
+                    </div>
                 </form>
-
             </div>
         </div>
     </div>
-</main>
-</div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
-        crossorigin="anonymous"></script>
-
-<!-- Scripts personalizados -->
-<script th:src="@{/js/modal.js}"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+            crossorigin="anonymous"></script>
+    
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Script para el modal -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalFecha = document.getElementById('modalFecha');
+            const inputFecha = document.getElementById('fecha');
+            
+            // Establecer fecha mínima (ahora)
+            if (inputFecha) {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                inputFecha.min = now.toISOString().slice(0, 16);
+            }
+            
+            if (modalFecha) {
+                modalFecha.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const nombre = button.getAttribute('data-nombre');
+                    const precio = button.getAttribute('data-precio');
+                    const id = button.getAttribute('data-id');
+                    
+                    document.getElementById('modalNombre').textContent = nombre;
+                    document.getElementById('modalPrecio').textContent = parseFloat(precio).toFixed(2);
+                    document.getElementById('modalId').value = id;
+                });
+            }
+        });
+        
+        // Mostrar mensaje con SweetAlert2 si existe
+        const mensaje = '[[${mensaje}]]';
+        const tipoMensaje = '[[${tipoMensaje}]]';
+        
+        if (mensaje && mensaje !== '') {
+            Swal.fire({
+                title: tipoMensaje === 'success' ? '¡Éxito!' : tipoMensaje === 'danger' ? 'Error' : 'Información',
+                text: mensaje,
+                icon: tipoMensaje === 'success' ? 'success' : tipoMensaje === 'danger' ? 'error' : 'info',
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#c26b1d'
+            });
+        }
+    </script>
 </body>
 
 </html>

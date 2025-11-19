@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -38,4 +39,10 @@ public interface PedidosRepository extends JpaRepository<Pedido, Integer> {
      */
     @Query("SELECT DISTINCT p FROM Pedido p JOIN FETCH p.detallePedido dp JOIN FETCH dp.producto WHERE p.usuario.idUsuario = :idUsuario")
     List<Pedido> findAllByUsuario_IdUsuario(@Param("idUsuario") int idUsuario);
+    
+    /**
+     * Busca pedidos por rango de fechas
+     */
+    @Query("SELECT p FROM Pedido p WHERE p.fechaPedido BETWEEN :fechaInicio AND :fechaFin ORDER BY p.fechaPedido DESC")
+    List<Pedido> findByFechaPedidoBetween(@Param("fechaInicio") LocalDateTime fechaInicio, @Param("fechaFin") LocalDateTime fechaFin);
 }

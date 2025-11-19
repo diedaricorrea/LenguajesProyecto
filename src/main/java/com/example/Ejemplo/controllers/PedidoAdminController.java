@@ -7,6 +7,7 @@ import com.example.Ejemplo.models.Pedido;
 import com.example.Ejemplo.models.Usuario;
 import com.example.Ejemplo.services.PedidosService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -41,18 +43,54 @@ public class PedidoAdminController {
     
     /**
      * Lista todos los pedidos agrupados por estado
+     * Soporta filtro por rango de fechas
      * GET /admin/pedidos
      */
     @GetMapping
     public String listarPedidos(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+            @RequestParam(required = false) String filtro,
             @AuthenticationPrincipal UsuarioDetails userDetails,
             Model model) {
         try {
             Usuario usuario = userDetails.getUsuario();
             String rolNombre = usuario.getRol() != null ? usuario.getRol().toString() : "USUARIO";
             
-            // Obtener pedidos agrupados por estado (lógica delegada al service)
-            Map<EstadoPedido, List<PedidoDTO>> pedidosPorEstado = pedidosService.agruparPedidosPorEstado();
+            Map<EstadoPedido, List<PedidoDTO>> pedidosPorEstado;
+            String periodoTexto = "Todos los pedidos";
+            
+            // Aplicar filtros predefinidos
+            if (filtro != null) {
+                LocalDate hoy = LocalDate.now();
+                switch (filtro) {
+                    case "hoy":
+                        fechaInicio = hoy;
+                        fechaFin = hoy;
+                        periodoTexto = "Pedidos de hoy";
+                        break;
+                    case "semana":
+                        fechaInicio = hoy.minusDays(hoy.getDayOfWeek().getValue() - 1);
+                        fechaFin = hoy;
+                        periodoTexto = "Pedidos de esta semana";
+                        break;
+                    case "mes":
+                        fechaInicio = hoy.withDayOfMonth(1);
+                        fechaFin = hoy;
+                        periodoTexto = "Pedidos de este mes";
+                        break;
+                }
+            }
+            
+            // Obtener pedidos según filtro de fecha
+            if (fechaInicio != null && fechaFin != null) {
+                pedidosPorEstado = pedidosService.agruparPedidosPorEstadoYFecha(fechaInicio, fechaFin);
+                if (filtro == null) {
+                    periodoTexto = "Pedidos del " + fechaInicio + " al " + fechaFin;
+                }
+            } else {
+                pedidosPorEstado = pedidosService.agruparPedidosPorEstado();
+            }
             
             model.addAttribute("usuarioAdmins", rolNombre);
             model.addAttribute("pedidosPendientes", pedidosPorEstado.getOrDefault(EstadoPedido.PENDIENTE, List.of()));
@@ -65,8 +103,28 @@ public class PedidoAdminController {
                     .mapToInt(List::size)
                     .sum();
             model.addAttribute("totalPedidos", totalPedidos);
+            model.addAttribute("periodoTexto", periodoTexto);
+            model.addAttribute("fechaInicio", fechaInicio);
+            model.addAttribute("fechaFin", fechaFin);
+            model.addAttribute("filtroActivo", filtro);
             
-            log.debug("Listando pedidos: Total={}", totalPedidos);
+            // Calcular estadísticas del período
+            double totalVentas = pedidosPorEstado.values().stream()
+                    .flatMap(List::stream)
+                    .filter(p -> p.getEstado() != EstadoPedido.CANCELADO)
+                    .mapToDouble(PedidoDTO::getTotal)
+                    .sum();
+            
+            int pedidosCompletados = pedidosPorEstado.getOrDefault(EstadoPedido.ENTREGADO, List.of()).size();
+            int pedidosCancelados = pedidosPorEstado.getOrDefault(EstadoPedido.CANCELADO, List.of()).size();
+            double promedioVenta = totalPedidos > 0 ? totalVentas / totalPedidos : 0;
+            
+            model.addAttribute("totalVentas", totalVentas);
+            model.addAttribute("pedidosCompletados", pedidosCompletados);
+            model.addAttribute("pedidosCanceladosCount", pedidosCancelados);
+            model.addAttribute("promedioVenta", promedioVenta);
+            
+            log.debug("Listando pedidos: Total={}, Período={}", totalPedidos, periodoTexto);
             
             return "administrador/pedidosLista";
             
