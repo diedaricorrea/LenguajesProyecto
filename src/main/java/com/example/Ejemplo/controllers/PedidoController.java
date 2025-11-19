@@ -118,8 +118,14 @@ public class PedidoController {
 
             // 5. Crear pedido con estado inicial PENDIENTE
             Pedido pedido = new Pedido();
-            pedido.setUsuario(usuarioService.findUsuarioById(idUsuario)
-                    .orElseThrow(() -> new IllegalStateException("Usuario no encontrado")));
+            
+            // Buscar entidad Usuario usando método legacy del service
+            Usuario usuarioEntity = usuarioService.findUsuarioEntityById(idUsuario);
+            if (usuarioEntity == null) {
+                throw new IllegalStateException("Usuario no encontrado");
+            }
+            
+            pedido.setUsuario(usuarioEntity);
             pedido.setFechaEntrega(horaEntrega);
             pedido.setCodigoPedido(pedidosService.generarCodigoUnico());
             pedido.setEstado(EstadoPedido.PENDIENTE); // Estado inicial

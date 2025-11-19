@@ -21,6 +21,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/admin/productos")
+@PreAuthorize("hasAnyAuthority('PRODUCTOS_VER', 'PRODUCTOS_GESTIONAR', 'ROLE_ADMINISTRADOR')")
 @RequiredArgsConstructor
 @Slf4j
 public class ProductoAdminController {

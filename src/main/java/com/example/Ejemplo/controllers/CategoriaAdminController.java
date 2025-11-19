@@ -26,6 +26,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/admin/categorias")
+@PreAuthorize("hasAnyAuthority('CATEGORIAS_VER', 'CATEGORIAS_GESTIONAR', 'ROLE_ADMINISTRADOR')")
 @RequiredArgsConstructor
 @Slf4j
 public class CategoriaAdminController {

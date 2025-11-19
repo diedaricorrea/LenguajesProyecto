@@ -9,6 +9,7 @@ import com.example.Ejemplo.services.impl.ProductoServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/menuDia")
+@PreAuthorize("hasAnyAuthority('MENU_DIA_VER', 'MENU_DIA_GESTIONAR', 'ROLE_ADMINISTRADOR')")
 public class MenuDiaController {
     private final ProductoServiceImpl productosServiceImpl;
     private final MenuDiaServiceImpl menuDiaServiceImpl;

@@ -29,8 +29,8 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/admin/pedidos")
+@PreAuthorize("hasAnyAuthority('PEDIDOS_VER', 'PEDIDOS_GESTIONAR', 'ROLE_ADMINISTRADOR')")
 @Slf4j
-@PreAuthorize("hasAnyAuthority('ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
 public class PedidoAdminController {
     
     private final PedidosService pedidosService;

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="https://www.thymeleaf.org">
+<html lang="es" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <body>
 
@@ -10,37 +11,67 @@
             <p>Panel de Administración</p>
         </div>
         <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'productos' ? 'active' : ''}" th:href="@{/admin/productos}"><i
-                        class="bi bi-box-seam"></i>Gestion de Productos</a>
+            <!-- Productos - Solo si tiene permisos de productos -->
+            <li class="nav-item" sec:authorize="hasAnyAuthority('PRODUCTOS_VER', 'PRODUCTOS_GESTIONAR', 'PRODUCTOS_CREAR', 'PRODUCTOS_EDITAR', 'ROLE_ADMINISTRADOR')">
+                <a class="nav-link" th:classappend="${activeTab == 'productos' ? 'active' : ''}" th:href="@{/admin/productos}">
+                    <i class="bi bi-box-seam"></i>Gestión de Productos
+                </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'categorias' ? 'active' : ''}" th:href="@{/admin/categorias}"><i
-                        class="bi bi-folder"></i>Gestion de Categorias</a>
+            
+            <!-- Categorías - Solo si tiene permisos de categorías -->
+            <li class="nav-item" sec:authorize="hasAnyAuthority('CATEGORIAS_VER', 'CATEGORIAS_GESTIONAR', 'CATEGORIAS_CREAR', 'CATEGORIAS_EDITAR', 'ROLE_ADMINISTRADOR')">
+                <a class="nav-link" th:classappend="${activeTab == 'categorias' ? 'active' : ''}" th:href="@{/admin/categorias}">
+                    <i class="bi bi-folder"></i>Gestión de Categorías
+                </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'pedidos' ? 'active' : ''}" th:href="@{/admin/pedidos}"><i
-                        class="bi bi-receipt"></i>Gestión de Pedidos</a>
+            
+            <!-- Pedidos - Solo si tiene permisos de pedidos -->
+            <li class="nav-item" sec:authorize="hasAnyAuthority('PEDIDOS_VER', 'PEDIDOS_GESTIONAR', 'PEDIDOS_ACTUALIZAR_ESTADO', 'ROLE_ADMINISTRADOR')">
+                <a class="nav-link" th:classappend="${activeTab == 'pedidos' ? 'active' : ''}" th:href="@{/admin/pedidos}">
+                    <i class="bi bi-receipt"></i>Gestión de Pedidos
+                </a>
             </li>
-            <li class="nav-item" th:if="${usuarioAdmins == 'ADMINISTRADOR'}">
-                <a class="nav-link" th:classappend="${activeTab == 'usuarios' ? 'active' : ''}" th:href="@{/usuarios/panelAdmin}"><i
-                        class="bi bi-person me-2"></i>Usuarios</a>
+            
+            <!-- Usuarios - Solo ADMINISTRADOR o con permisos de usuarios -->
+            <li class="nav-item" sec:authorize="hasAnyAuthority('USUARIOS_VER', 'USUARIOS_GESTIONAR_ROLES', 'ROLE_ADMINISTRADOR')">
+                <a class="nav-link" th:classappend="${activeTab == 'usuarios' ? 'active' : ''}" th:href="@{/usuarios/panelAdmin}">
+                    <i class="bi bi-person me-2"></i>Usuarios
+                </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'menuDia' ? 'active' : ''}" th:href="@{/menuDia/}"><i
-                        class="bi bi-list-ul"></i>Menu del dia</a>
+            
+            <!-- Roles y Permisos - Solo ADMINISTRADOR -->
+            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+                <a class="nav-link" th:classappend="${activeTab == 'roles' ? 'active' : ''}" th:href="@{/roles}">
+                    <i class="bi bi-shield-check me-2"></i>Roles y Permisos
+                </a>
             </li>
-<!--            <li class="nav-item">-->
-<!--                <a class="nav-link" th:classappend="${activeTab == 'ventas' ? 'active' : ''}" th:href="@{/ventas2}"><i-->
-<!--                        class="bi bi-list-ul"></i>Ventas</a>-->
-<!--            </li>-->
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == 'board' ? 'active' : ''}" th:href="@{/ventas}"><i
-                        class="bi bi-list-ul"></i>DashBoard</a>
+            
+            <!-- Menú del Día - Solo si tiene permisos -->
+            <li class="nav-item" sec:authorize="hasAnyAuthority('MENU_DIA_VER', 'MENU_DIA_GESTIONAR', 'ROLE_ADMINISTRADOR')">
+                <a class="nav-link" th:classappend="${activeTab == 'menuDia' ? 'active' : ''}" th:href="@{/menuDia/}">
+                    <i class="bi bi-list-ul"></i>Menú del día
+                </a>
             </li>
+            
+            <!-- Ventas/Dashboard - Solo si tiene permisos de estadísticas -->
+            <li class="nav-item" sec:authorize="hasAnyAuthority('ESTADISTICAS_VER', 'VENTAS_VER', 'ESTADISTICAS_VENTAS', 'ESTADISTICAS_PRODUCTOS', 'ROLE_ADMINISTRADOR')">
+                <a class="nav-link" th:classappend="${activeTab == 'board' ? 'active' : ''}" th:href="@{/ventas}">
+                    <i class="bi bi-graph-up"></i>Dashboard
+                </a>
+            </li>
+            
+            <!-- Catálogo - Siempre visible (para usuarios sin permisos admin) -->
+            <li class="nav-item" sec:authorize="isAuthenticated()">
+                <a class="nav-link" th:href="@{/catalogo}">
+                    <i class="bi bi-shop"></i>Catálogo
+                </a>
+            </li>
+            
+            <!-- Salir - Siempre visible -->
             <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeTab == '' ? '' : ''}" th:href="@{/login/medio}"><i
-                        class="bi bi-box-arrow-right"></i>Salir</a>
+                <a class="nav-link" th:href="@{/login/medio}">
+                    <i class="bi bi-box-arrow-right"></i>Salir
+                </a>
             </li>
         </ul>
     </div>

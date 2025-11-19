@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignar Permisos | UTPedidos</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Navbar -->
+        <div th:replace="~{fragments/navbarAdmin :: navbarA('roles')}"></div>
+
+        <!-- Contenido principal -->
+        <main class="container-fluid main-content">
+            
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-2">
+                                <i class="bi bi-key-fill text-primary"></i> 
+                                Asignar Permisos
+                            </h2>
+                            <h4 class="text-muted">
+                                Rol: <span class="text-dark fw-bold" th:text="${rol.nombre}">NOMBRE_ROL</span>
+                            </h4>
+                        </div>
+                        <a th:href="@{/roles}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <form th:action="@{/roles/{id}/permisos/asignar(id=${rol.idRol})}" method="post">
+                
+                <!-- Controles de selección -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Selección Masiva</h5>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-outline-primary" onclick="seleccionarTodos()">
+                                            <i class="bi bi-check-all"></i> Todos
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="deseleccionarTodos()">
+                                            <i class="bi bi-x-lg"></i> Ninguno
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Permisos agrupados por módulo -->
+                <div class="row">
+                    <div class="col-12">
+                        <div th:each="entry : ${permisosAgrupados}" class="card mb-3">
+                            <div class="card-header bg-primary text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-folder-fill"></i>
+                                        <span th:text="${entry.key}">MÓDULO</span>
+                                    </h5>
+                                    <button type="button" 
+                                            class="btn btn-light btn-sm" 
+                                            th:data-modulo="${entry.key}"
+                                            onclick="seleccionarModulo(this.dataset.modulo)">
+                                        <i class="bi bi-check-square"></i> Seleccionar módulo
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-2" th:each="permiso : ${entry.value}">
+                                        <div class="form-check">
+                                            <input class="form-check-input permiso-check" 
+                                                   th:classappend="${entry.key}"
+                                                   type="checkbox" 
+                                                   name="idsPermisos" 
+                                                   th:value="${permiso.idPermiso}"
+                                                   th:id="'permiso-' + ${permiso.idPermiso}"
+                                                   th:checked="${#lists.contains(permisosAsignados, permiso.idPermiso)}">
+                                            <label class="form-check-label" 
+                                                   th:for="'permiso-' + ${permiso.idPermiso}">
+                                                <strong th:text="${permiso.nombre}">Nombre Permiso</strong>
+                                                <br>
+                                                <small class="text-muted" th:text="${permiso.descripcion}">Descripción</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mensaje si no hay permisos -->
+                        <div th:if="${#maps.isEmpty(permisosAgrupados)}" class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle-fill"></i> 
+                            No hay permisos disponibles en el sistema.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/roles}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Guardar Permisos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+        </main>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Seleccionar todos los permisos
+        function seleccionarTodos() {
+            document.querySelectorAll('.permiso-check').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        // Deseleccionar todos los permisos
+        function deseleccionarTodos() {
+            document.querySelectorAll('.permiso-check').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        // Seleccionar permisos de un módulo específico
+        function seleccionarModulo(modulo) {
+            document.querySelectorAll('.' + modulo).forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        // Contador de permisos seleccionados
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.permiso-check');
+            const seleccionados = Array.from(checkboxes).filter(cb => cb.checked).length;
+            
+            console.log(`Permisos asignados actualmente: ${seleccionados}`);
+        });
+    </script>
+        </main>
+    </div>
+</body>
+</html>
