@@ -523,7 +523,9 @@
                 <!-- Botón anterior -->
                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{'/catalogo'(categoria=${categoriaActual}, busqueda=${busquedaActual}, page=${currentPage - 1})}">Anterior</a>
+                       th:href="@{'/catalogo'(categoria=${categoriaActual}, busqueda=${busquedaActual}, page=${currentPage - 1})}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
                 </li>
                 <!-- Números de página -->
                 <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
@@ -535,7 +537,9 @@
                 <!-- Botón siguiente -->
                 <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{'/catalogo'(categoria=${categoriaActual}, busqueda=${busquedaActual}, page=${currentPage + 1})}">Siguiente</a>
+                       th:href="@{'/catalogo'(categoria=${categoriaActual}, busqueda=${busquedaActual}, page=${currentPage + 1})}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
                 </li>
             </ul>
         </nav>
