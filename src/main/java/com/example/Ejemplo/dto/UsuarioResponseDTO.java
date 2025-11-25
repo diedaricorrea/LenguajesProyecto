@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-/**
- * DTO completo para respuesta de Usuario
- * Incluye información detallada sin exponer datos sensibles
- */
+
 @Data
 @Builder
 @NoArgsConstructor

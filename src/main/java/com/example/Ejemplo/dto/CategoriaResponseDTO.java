@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO de respuesta para Categoría - incluye información adicional como cantidad de productos
- */
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -17,7 +15,7 @@ public class CategoriaResponseDTO {
     private Integer idCategoria;
     private String nombre;
     private Long cantidadProductos;
-    private Boolean tieneProdutos; // Para facilitar validaciones en frontend
+    private Boolean tieneProdutos; 
     
     // Constructor sin cantidad de productos
     public CategoriaResponseDTO(Integer idCategoria, String nombre) {

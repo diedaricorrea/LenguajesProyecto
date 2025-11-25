@@ -30,15 +30,11 @@ public class RolController {
     private final RolEntityService rolService;
     private final PermisoService permisoService;
 
-    /**
-     * Lista todos los roles
-     */
     @GetMapping
     public String listarRoles(Model model, @AuthenticationPrincipal UsuarioDetails userDetails) {
         logger.info("Accediendo a la lista de roles");
         
         try {
-            // Obtener información del usuario actual
             String rolActual = userDetails.getUsuario().getRolNombre();
             
             List<RolResponseDTO> roles = rolService.findAllRolesConPermisos();
@@ -59,9 +55,6 @@ public class RolController {
         }
     }
 
-    /**
-     * Crear nuevo rol
-     */
     @PostMapping("/save")
     public String crearRol(@Valid @ModelAttribute RolCreateDTO rolDTO,
                           BindingResult result,
@@ -93,9 +86,6 @@ public class RolController {
         return "redirect:/roles";
     }
 
-    /**
-     * Actualizar rol existente
-     */
     @PostMapping("/update")
     public String actualizarRol(@RequestParam Integer idRol,
                                @Valid @ModelAttribute RolCreateDTO rolDTO,
@@ -128,9 +118,6 @@ public class RolController {
         return "redirect:/roles";
     }
 
-    /**
-     * Cambiar estado del rol (activar/desactivar)
-     */
     @PostMapping("/{id}/cambiar-estado")
     @ResponseBody
     public Map<String, Object> cambiarEstado(@PathVariable Integer id,
@@ -159,9 +146,6 @@ public class RolController {
         }
     }
 
-    /**
-     * Eliminar rol
-     */
     @PostMapping("/{id}/eliminar")
     @ResponseBody
     public Map<String, Object> eliminarRol(@PathVariable Integer id) {
@@ -189,9 +173,6 @@ public class RolController {
         }
     }
 
-    /**
-     * Mostrar formulario de asignación de permisos
-     */
     @GetMapping("/{id}/permisos")
     public String mostrarAsignacionPermisos(@PathVariable Integer id, 
                                            Model model,
@@ -199,14 +180,12 @@ public class RolController {
         logger.info("Mostrando formulario de permisos para rol ID: {}", id);
         
         try {
-            // Obtener información del usuario actual
             String rolActual = userDetails.getUsuario().getRolNombre();
             
             RolResponseDTO rol = rolService.findRolById(id);
             Map<String, List<PermisoDTO>> permisosAgrupados = 
                 permisoService.findPermisosAgrupadosPorModulo();
             
-            // IDs de permisos ya asignados
             List<Integer> permisosAsignados = rol.getPermisos().stream()
                 .map(PermisoDTO::getIdPermiso)
                 .toList();
@@ -225,9 +204,7 @@ public class RolController {
         }
     }
 
-    /**
-     * Asignar permisos a un rol
-     */
+
     @PostMapping("/{id}/permisos/asignar")
     public String asignarPermisos(@PathVariable Integer id,
                                  @RequestParam(required = false) List<Integer> idsPermisos,
@@ -239,7 +216,6 @@ public class RolController {
             AsignarPermisosDTO asignarDTO = new AsignarPermisosDTO();
             asignarDTO.setIdRol(id);
             
-            // Convertir List a Set
             if (idsPermisos != null && !idsPermisos.isEmpty()) {
                 asignarDTO.setIdsPermisos(new java.util.HashSet<>(idsPermisos));
             } else {
@@ -260,18 +236,14 @@ public class RolController {
         return "redirect:/roles";
     }
 
-    /**
-     * API: Obtener rol por ID (para modales)
-     */
+
     @GetMapping("/{id}/datos")
     @ResponseBody
     public RolResponseDTO obtenerRolDatos(@PathVariable Integer id) {
         return rolService.findRolById(id);
     }
 
-    /**
-     * API: Verificar si rol tiene usuarios asignados
-     */
+
     @GetMapping("/{id}/tiene-usuarios")
     @ResponseBody
     public Map<String, Boolean> tieneUsuarios(@PathVariable Integer id) {

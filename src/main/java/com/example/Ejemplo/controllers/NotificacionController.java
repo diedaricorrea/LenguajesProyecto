@@ -33,9 +33,7 @@ public class NotificacionController {
         return "redirect:/admin/pedidos";
     }
     
-    /**
-     * Elimina una notificación específica
-     */
+
     @PostMapping("/eliminar")
     public String eliminarNotificacion(
             @RequestParam("idNotificacion") int idNotificacion,
@@ -52,9 +50,7 @@ public class NotificacionController {
         return "redirect:" + returnUrl;
     }
     
-    /**
-     * Elimina todas las notificaciones del usuario
-     */
+
     @PostMapping("/eliminar-todas")
     public String eliminarTodasNotificaciones(
             @RequestParam(value = "returnUrl", required = false, defaultValue = "/catalogo") String returnUrl,

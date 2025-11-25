@@ -16,10 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-/**
- * Controlador para la gestión de usuarios
- * Refactorizado para usar DTOs y mejorar validaciones
- */
+
 @Controller
 @RequestMapping("/usuarios")
 public class UsuariosController {
@@ -34,24 +31,18 @@ public class UsuariosController {
         this.rolService = rolService;
     }
 
-    /**
-     * Panel principal de gestión de usuarios
-     */
+
     @GetMapping("/panelAdmin")
     public String panelAdmin(Model model, @AuthenticationPrincipal UsuarioDetails userDetails) {
         logger.info("Accediendo al panel de administración de usuarios");
         
         try {
-            // Obtener información del usuario actual
             String rolActual = userDetails.getUsuario().getRolNombre();
             
-            // Obtener lista de usuarios administrativos/trabajadores
             List<UsuarioDTO> usuarios = usuarioService.findAllUsuariosAdministrativos();
             
-            // Obtener estadísticas
             EstadisticasUsuariosDTO estadisticas = usuarioService.obtenerEstadisticas();
             
-            // Obtener roles activos para asignación
             List<RolDTO> rolesDisponibles = rolService.findRolesActivos();
             
             model.addAttribute("usuarioAdmins", rolActual);
@@ -69,9 +60,6 @@ public class UsuariosController {
         }
     }
 
-    /**
-     * Guardar nuevo usuario
-     */
     @PostMapping("/save")
     public String saveUsuario(
             @ModelAttribute @Valid UsuarioCreateDTO usuarioDTO,
@@ -108,9 +96,6 @@ public class UsuariosController {
         return "redirect:/usuarios/panelAdmin";
     }
 
-    /**
-     * Actualizar usuario existente
-     */
     @PostMapping("/update")
     public String updateUsuario(
             @RequestParam Integer actId,
@@ -122,7 +107,6 @@ public class UsuariosController {
         logger.info("Actualizando usuario ID: {}", actId);
         
         try {
-            // Validaciones básicas
             if (actNombre == null || actNombre.trim().isEmpty()) {
                 throw new IllegalArgumentException("El nombre no puede estar vacío");
             }
@@ -131,7 +115,6 @@ public class UsuariosController {
                 throw new IllegalArgumentException("El nombre debe tener al menos 3 caracteres");
             }
             
-            // Crear DTO de actualización
             UsuarioUpdateDTO updateDTO = UsuarioUpdateDTO.builder()
                     .idUsuario(actId)
                     .nombre(actNombre.trim())
@@ -159,9 +142,6 @@ public class UsuariosController {
         return "redirect:/usuarios/panelAdmin";
     }
 
-    /**
-     * Buscar usuarios por ID o texto
-     */
     @GetMapping("/search")
     public String usuariosSearch(
             @RequestParam(required = false) String busqueda,
@@ -201,9 +181,6 @@ public class UsuariosController {
         }
     }
     
-    /**
-     * Cambiar estado de un usuario (AJAX)
-     */
     @PostMapping("/{id}/cambiar-estado")
     @ResponseBody
     public String cambiarEstado(@PathVariable Integer id, @RequestParam boolean estado) {
@@ -218,9 +195,6 @@ public class UsuariosController {
         }
     }
     
-    /**
-     * Obtener estadísticas de usuarios (API REST)
-     */
     @GetMapping("/api/estadisticas")
     @ResponseBody
     public EstadisticasUsuariosDTO obtenerEstadisticas() {

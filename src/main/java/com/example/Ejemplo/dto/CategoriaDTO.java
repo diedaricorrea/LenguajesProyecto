@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO básico para Categoría - usado en formularios y operaciones simples
+ * DTO básico para Categoría
  */
 @Data
 @Builder
@@ -17,7 +17,7 @@ public class CategoriaDTO {
     private Integer idCategoria;
     private String nombre;
     
-    // Constructor de conveniencia
+    
     public CategoriaDTO(String nombre) {
         this.nombre = nombre;
     }

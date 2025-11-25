@@ -7,9 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO para crear un nuevo rol
- */
+
 @Data
 @Builder
 @NoArgsConstructor

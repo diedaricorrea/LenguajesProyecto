@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO de respuesta para Producto - incluye toda la información necesaria para mostrar
- */
+
 @Data
 @Builder
 @NoArgsConstructor

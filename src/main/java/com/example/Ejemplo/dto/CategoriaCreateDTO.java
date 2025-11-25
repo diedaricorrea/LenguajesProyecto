@@ -7,9 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO para crear/actualizar Categoría - con validaciones
- */
+
 @Data
 @Builder
 @NoArgsConstructor

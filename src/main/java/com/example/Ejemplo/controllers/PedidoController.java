@@ -15,10 +15,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Controlador para la gestión de pedidos del usuario
- * Permite a los usuarios ver sus pedidos y crear nuevos desde el carrito
- */
+
 @Slf4j
 @Controller
 @RequestMapping("/pedidos")
@@ -44,21 +41,18 @@ public class PedidoController {
         this.notificacionService = notificacionService;
     }
 
-    /**
-     * Muestra todos los pedidos del usuario actual
-     * GET /pedidos
-     */
+
     @GetMapping()
     public String verPedidos(@AuthenticationPrincipal UsuarioDetails userDetails, Model model) {
         try {
             Usuario usuario = userDetails.getUsuario();
             int idUsuario = usuario.getIdUsuario();
             
-            // Obtener pedidos y convertir a DTOs
+
             List<Pedido> pedidos = pedidosService.obtenerPedidosPorUsuario(idUsuario);
             List<PedidoDTO> pedidosDTO = pedidosService.convertirPedidosADTO(pedidos);
             
-            // Separar pedidos activos y completados
+
             List<PedidoDTO> pedidosActivos = pedidosDTO.stream()
                     .filter(p -> !p.getEstado().esFinal())
                     .collect(Collectors.toList());
@@ -84,10 +78,7 @@ public class PedidoController {
         }
     }
 
-    /**
-     * Crea un nuevo pedido desde el carrito
-     * POST /pedidos/pedir
-     */
+
     @PostMapping("/pedir")
     public String pedir(@AuthenticationPrincipal UsuarioDetails userDetails, 
                        @RequestParam("horaEntrega") LocalTime horaEntrega, 
@@ -188,18 +179,13 @@ public class PedidoController {
         }
     }
 
-    /**
-     * Obtiene todos los productos del carrito del usuario
-     */
+
     private List<Producto> obtenerTodosProductos(int idUsuario) {
         return carritoService.obtenerCarritosPorUsuario(idUsuario).stream()
                 .map(Carrito::getIdProducto)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Obtiene las cantidades de todos los productos del carrito
-     */
     private List<Integer> obtenerTodosProductosConCantidad(int idUsuario) {
         return carritoService.obtenerCarritosPorUsuario(idUsuario).stream()
                 .map(Carrito::getCantidad)

@@ -7,10 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO específico para el registro público de usuarios
- * Solo permite crear usuarios con rol USUARIO
- */
+
 @Data
 @Builder
 @NoArgsConstructor

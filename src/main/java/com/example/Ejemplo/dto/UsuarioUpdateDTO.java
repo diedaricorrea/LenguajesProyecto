@@ -8,10 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO para actualizar un usuario existente
- * No incluye password (se actualiza por separado por seguridad)
- */
+
 @Data
 @Builder
 @NoArgsConstructor

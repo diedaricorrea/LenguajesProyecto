@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * Controlador de autenticación y registro
- * Refactorizado para usar DTOs
- */
+
 @Controller
 public class LoginController {
     
@@ -42,12 +39,10 @@ public class LoginController {
         return "usuario/sobreNosotros";
     }
 
-    /**
-     * Redirecciona según el rol del usuario autenticado
-     */
+
     @GetMapping("/login2")
     public String redirectPorRol(Authentication authentication) {
-        // Buscar el rol (authority que empieza con ROLE_)
+
         String rol = authentication.getAuthorities().stream()
                 .map(auth -> auth.getAuthority())
                 .filter(auth -> auth.startsWith("ROLE_"))
@@ -57,18 +52,16 @@ public class LoginController {
         logger.info("Usuario autenticado con rol: {}", rol);
         logger.debug("Todas las autoridades: {}", authentication.getAuthorities());
         
-        // Si tiene rol USUARIO (estudiantes), va al catálogo
+
         if (rol.equals("ROLE_USUARIO")) {
             return "redirect:/catalogo";
         }
         
-        // Administradores y trabajadores van directo al panel de productos
+
         return "redirect:/admin/productos";
     }
 
-    /**
-     * Procesa el registro de un nuevo usuario
-     */
+
     @PostMapping("/register/save")
     public String registrarUsuario(
             @ModelAttribute("usuarioRegistro") @Valid UsuarioRegistroDTO registroDTO,
@@ -78,7 +71,7 @@ public class LoginController {
         
         logger.info("Intentando registrar nuevo usuario con código: {}", registroDTO.getCodigoEstudiantil());
         
-        // Validar errores de formulario
+
         if (resultado.hasErrors()) {
             logger.warn("Errores de validación en el registro");
             redirectAttributes.addFlashAttribute("error", "Por favor verifica los datos del formulario");
@@ -87,7 +80,7 @@ public class LoginController {
         }
         
         try {
-            // Registrar usuario
+ 
             UsuarioResponseDTO creado = usuarioService.registrarUsuario(registroDTO);
             
             logger.info("Usuario registrado exitosamente: {}", creado.getCorreo());

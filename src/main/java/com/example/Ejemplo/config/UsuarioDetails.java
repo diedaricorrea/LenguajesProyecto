@@ -31,13 +31,13 @@ public class UsuarioDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
         
-        // Agregar el rol como autoridad (ROLE_ADMINISTRADOR, ROLE_USUARIO, etc.)
+        
         if (usuario.getRolEntity() != null) {
             String roleName = "ROLE_" + usuario.getRolEntity().getNombre();
             authorities.add(new SimpleGrantedAuthority(roleName));
             log.debug("🔑 Usuario '{}' tiene rol: {}", usuario.getCorreo(), roleName);
             
-            // Agregar cada permiso como autoridad
+            
             if (usuario.getRolEntity().getPermisos() != null) {
                 List<GrantedAuthority> permisos = usuario.getRolEntity().getPermisos().stream()
                         .map(permiso -> new SimpleGrantedAuthority(permiso.getNombre()))
@@ -53,7 +53,7 @@ public class UsuarioDetails implements UserDetails {
                         usuario.getCorreo(), usuario.getRolEntity().getNombre());
             }
         } else if (usuario.getRol() != null) {
-            // Fallback al enum Rol para compatibilidad
+           
             String roleName = "ROLE_" + usuario.getRol().toString();
             authorities.add(new SimpleGrantedAuthority(roleName));
             log.warn("🔄 Usuario '{}' usando rol ENUM (legacy): {}", usuario.getCorreo(), roleName);
@@ -76,22 +76,22 @@ public class UsuarioDetails implements UserDetails {
     
     @Override
     public boolean isAccountNonExpired() {
-        return true; // Las cuentas no expiran
+        return true; 
     }
     
     @Override
     public boolean isAccountNonLocked() {
-        return true; // Las cuentas no se bloquean
+        return true;
     }
     
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // Las credenciales no expiran
+        return true; 
     }
     
     @Override
     public boolean isEnabled() {
-        // Verificar que el usuario esté activo
+       
         boolean activo = usuario.isEstado();
         if (!activo) {
             log.warn("🚫 Usuario '{}' está INACTIVO - Login denegado", usuario.getCorreo());

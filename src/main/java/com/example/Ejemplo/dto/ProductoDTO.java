@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO básico para Producto - usado en listados y operaciones simples
- */
+
 @Data
 @Builder
 @NoArgsConstructor

@@ -21,9 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Controlador para la gestion administrativa de categorias
- */
+
 @Controller
 @RequestMapping("/admin/categorias")
 @PreAuthorize("hasAnyAuthority('CATEGORIAS_VER', 'CATEGORIAS_GESTIONAR', 'ROLE_ADMINISTRADOR')")
@@ -33,9 +31,7 @@ public class CategoriaAdminController {
 
     private final CategoriaService categoriaService;
 
-    /**
-     * Lista todas las categorias con opciones de gestion
-     */
+
     @GetMapping
     @PreAuthorize("hasAnyAuthority('CATEGORIAS_VER', 'CATEGORIAS_GESTIONAR', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
     public String listarCategorias(
@@ -48,7 +44,7 @@ public class CategoriaAdminController {
 
             List<CategoriaResponseDTO> categorias = categoriaService.obtenerTodasConDetalles();
             
-            // Filtrar por busqueda si se proporciona
+
             if (busqueda != null && !busqueda.trim().isEmpty()) {
                 categorias = categorias.stream()
                     .filter(c -> c.getNombre().toLowerCase().contains(busqueda.toLowerCase()))
@@ -70,9 +66,7 @@ public class CategoriaAdminController {
         }
     }
 
-    /**
-     * Muestra el formulario para crear una nueva categoria
-     */
+
     @GetMapping("/nueva")
     @PreAuthorize("hasAnyAuthority('CATEGORIAS_CREAR', 'CATEGORIAS_GESTIONAR', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
     public String nuevaCategoria(Model model, @AuthenticationPrincipal UsuarioDetails userDetails) {
@@ -87,9 +81,7 @@ public class CategoriaAdminController {
         return "administrador/categoriaFormulario";
     }
 
-    /**
-     * Muestra el formulario para editar una categoria existente
-     */
+
     @GetMapping("/{id}/editar")
     @PreAuthorize("hasAnyAuthority('CATEGORIAS_EDITAR', 'CATEGORIAS_GESTIONAR', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
     public String editarCategoria(
@@ -125,9 +117,7 @@ public class CategoriaAdminController {
         }
     }
 
-    /**
-     * Guarda una categoria nueva o actualiza una existente
-     */
+
     @PostMapping("/guardar")
     @PreAuthorize("hasAnyAuthority('CATEGORIAS_CREAR', 'CATEGORIAS_EDITAR', 'CATEGORIAS_GESTIONAR', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
     public String guardarCategoria(
@@ -177,9 +167,7 @@ public class CategoriaAdminController {
         return "redirect:/admin/categorias";
     }
 
-    /**
-     * Elimina una categoria (solo si no tiene productos asociados)
-     */
+
     @PostMapping("/{id}/eliminar")
     @PreAuthorize("hasAnyAuthority('CATEGORIAS_ELIMINAR', 'CATEGORIAS_GESTIONAR', 'ROLE_ADMINISTRADOR')")
     public String eliminarCategoria(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
@@ -210,9 +198,7 @@ public class CategoriaAdminController {
         return "redirect:/admin/categorias";
     }
 
-    /**
-     * API REST para obtener todas las categorias (util para AJAX)
-     */
+
     @GetMapping("/api/listar")
     @ResponseBody
     @PreAuthorize("hasAnyAuthority('CATEGORIAS_VER', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR', 'ROLE_USUARIO')")
@@ -221,9 +207,7 @@ public class CategoriaAdminController {
         return ResponseEntity.ok(categoriaService.obtenerTodas());
     }
 
-    /**
-     * API REST para verificar si existe una categoria con el nombre dado
-     */
+
     @GetMapping("/api/existe")
     @ResponseBody
     @PreAuthorize("hasAnyAuthority('CATEGORIAS_VER', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")

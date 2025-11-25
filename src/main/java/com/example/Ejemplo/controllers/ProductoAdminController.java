@@ -29,9 +29,6 @@ public class ProductoAdminController {
     private final ProductoService productoService;
     private final CategoriaService categoriaService;
 
-    /**
-     * Lista todos los productos con opciones de gestion
-     */
     @GetMapping
     @PreAuthorize("hasAnyAuthority('PRODUCTOS_GESTIONAR', 'PRODUCTOS_VER', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
     public String listarProductos(
@@ -45,14 +42,12 @@ public class ProductoAdminController {
 
             List<ProductoResponseDTO> productos = productoService.obtenerTodosConDetalles();
             
-            // Filtrar por busqueda si se proporciona
             if (busqueda != null && !busqueda.trim().isEmpty()) {
                 productos = productos.stream()
                     .filter(p -> p.getNombre().toLowerCase().contains(busqueda.toLowerCase()))
                     .toList();
             }
             
-            // Filtrar por estado si se proporciona
             if (estado != null && !estado.isEmpty()) {
                 boolean estadoBoolean = "activo".equalsIgnoreCase(estado);
                 productos = productos.stream()
@@ -79,9 +74,7 @@ public class ProductoAdminController {
         }
     }
 
-    /**
-     * Muestra el formulario para crear un nuevo producto
-     */
+
     @GetMapping("/nuevo")
     @PreAuthorize("hasAnyAuthority('PRODUCTOS_CREAR', 'PRODUCTOS_GESTIONAR', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
     public String nuevoProducto(Model model, @AuthenticationPrincipal UsuarioDetails userDetails) {
@@ -98,9 +91,6 @@ public class ProductoAdminController {
         return "administrador/productoFormulario";
     }
 
-    /**
-     * Muestra el formulario para editar un producto existente
-     */
     @GetMapping("/{id}/editar")
     @PreAuthorize("hasAnyAuthority('PRODUCTOS_EDITAR', 'PRODUCTOS_GESTIONAR', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
     public String editarProducto(
@@ -115,7 +105,6 @@ public class ProductoAdminController {
             List<CategoriaDTO> categorias = categoriaService.obtenerTodas();
             Usuario usuario = userDetails.getUsuario();
             
-            // Convertir a CreateDTO para el formulario
             ProductoCreateDTO productoParaEditar = ProductoCreateDTO.builder()
                     .idProducto(producto.getIdProducto())
                     .nombre(producto.getNombre())
@@ -145,9 +134,7 @@ public class ProductoAdminController {
         }
     }
 
-    /**
-     * Guarda un producto nuevo o actualiza uno existente
-     */
+
     @PostMapping("/guardar")
     @PreAuthorize("hasAnyAuthority('PRODUCTOS_CREAR', 'PRODUCTOS_EDITAR', 'PRODUCTOS_GESTIONAR', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
     public String guardarProducto(
@@ -164,7 +151,6 @@ public class ProductoAdminController {
         try {
             log.info("Guardando producto. Nombre: {}, ID: {}", nombre, id);
             
-            // Validaciones basicas
             if (nombre == null || nombre.trim().isEmpty()) {
                 throw new IllegalArgumentException("El nombre del producto es obligatorio");
             }
@@ -180,8 +166,7 @@ public class ProductoAdminController {
             if (stock == null || stock < 0) {
                 throw new IllegalArgumentException("El stock no puede ser negativo");
             }
-            
-            // Obtener o crear categoria
+
             CategoriaDTO categoria = categoriaService.buscarPorNombre(categoriaNombre.trim())
                     .orElseGet(() -> {
                         CategoriaCreateDTO newCat = CategoriaCreateDTO.builder()
@@ -190,7 +175,6 @@ public class ProductoAdminController {
                         return categoriaService.crear(newCat);
                     });
             
-            // Crear DTO del producto
             ProductoCreateDTO productoDTO = ProductoCreateDTO.builder()
                     .idProducto(id)
                     .nombre(nombre.trim())
@@ -202,7 +186,7 @@ public class ProductoAdminController {
                     .nombreCategoria(categoria.getNombre())
                     .build();
             
-            // Guardar o actualizar
+
             if (id == null) {
                 productoService.crear(productoDTO, imagen);
                 log.info("Producto creado exitosamente");
@@ -228,9 +212,7 @@ public class ProductoAdminController {
         return "redirect:/admin/productos";
     }
 
-    /**
-     * Actualiza el stock de un producto
-     */
+
     @PostMapping("/{id}/actualizar-stock")
     @PreAuthorize("hasAnyAuthority('PRODUCTOS_EDITAR', 'PRODUCTOS_GESTIONAR', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
     public String actualizarStock(
@@ -256,9 +238,7 @@ public class ProductoAdminController {
         return "redirect:/admin/productos";
     }
 
-    /**
-     * Cambia el estado de un producto (activar/desactivar)
-     */
+
     @PostMapping("/{id}/cambiar-estado")
     @PreAuthorize("hasAnyAuthority('PRODUCTOS_GESTIONAR', 'ROLE_ADMINISTRADOR', 'ROLE_TRABAJADOR')")
     @ResponseBody
@@ -287,9 +267,6 @@ public class ProductoAdminController {
         }
     }
 
-    /**
-     * Desactiva un producto (soft delete)
-     */
     @PostMapping("/{id}/desactivar")
     @PreAuthorize("hasAnyAuthority('PRODUCTOS_ELIMINAR', 'PRODUCTOS_GESTIONAR', 'ROLE_ADMINISTRADOR')")
     public String desactivarProducto(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
@@ -309,9 +286,6 @@ public class ProductoAdminController {
         return "redirect:/admin/productos";
     }
 
-    /**
-     * Activa un producto previamente desactivado
-     */
     @PostMapping("/{id}/activar")
     @PreAuthorize("hasAnyAuthority('PRODUCTOS_GESTIONAR', 'ROLE_ADMINISTRADOR')")
     public String activarProducto(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
@@ -331,9 +305,7 @@ public class ProductoAdminController {
         return "redirect:/admin/productos";
     }
 
-    /**
-     * Elimina permanentemente un producto (solo administradores)
-     */
+
     @PostMapping("/{id}/eliminar-permanente")
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
     public String eliminarPermanente(@PathVariable Integer id, RedirectAttributes redirectAttributes) {

@@ -61,7 +61,6 @@ public class ProductoController {
             Model model) {
         Usuario usuario = userDetails != null ? userDetails.getUsuario() : null;
 
-        // Solo agregar datos de usuario si está autenticado
         if (usuario != null) {
             String rolNombre = usuario.getRol() != null ? usuario.getRol().toString() : "USUARIO";
             model.addAttribute("usuarioAdmins", rolNombre);
@@ -72,14 +71,12 @@ public class ProductoController {
             model.addAttribute("usuarioNombre", "Invitado");
         }
         
-        // Obtener menús del día HOY
         List<MenuDia> menusHoy = menuDiaServiceImpl.findMenusDelDia(LocalDate.now());
         List<Producto> productosMenuDelDia = menusHoy.stream()
                 .map(MenuDia::getProducto)
                 .collect(Collectors.toList());
         model.addAttribute("menusDelDia", productosMenuDelDia);
         
-        // Agregar objeto para el formulario de registro (modales)
         if (!model.containsAttribute("usuarioRegistro")) {
             model.addAttribute("usuarioRegistro", new UsuarioRegistroDTO());
         }
@@ -153,13 +150,11 @@ public class ProductoController {
             return "redirect:/catalogo";
         }
 
-        // Validar que haya stock disponible
         if (producto.getStock() <= 0) {
             redirectAttributes.addFlashAttribute("error", "Lo sentimos, este producto no tiene stock disponible.");
             return "redirect:/catalogo";
         }
 
-        // Validar que la cantidad solicitada no exceda el stock disponible
         if (cantidad > producto.getStock()) {
             redirectAttributes.addFlashAttribute("error", "No hay suficiente stock. Solo hay " + producto.getStock() + " unidades disponibles.");
             return "redirect:/catalogo";
@@ -171,7 +166,6 @@ public class ProductoController {
             if (carro.getIdProducto().getIdProducto() == idProducto) {
                 nuevaCantidad = carro.getCantidad() + cantidad;
                 
-                // Validar que la nueva cantidad total no exceda el stock
                 if (nuevaCantidad > producto.getStock()) {
                     redirectAttributes.addFlashAttribute("error", "No hay suficiente stock. Ya tienes " + carro.getCantidad() + " en el carrito. Stock disponible: " + producto.getStock());
                     return "redirect:/catalogo";

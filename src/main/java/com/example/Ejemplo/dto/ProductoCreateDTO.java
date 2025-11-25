@@ -6,9 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO para crear/actualizar Producto - con validaciones completas
- */
+
 @Data
 @Builder
 @NoArgsConstructor

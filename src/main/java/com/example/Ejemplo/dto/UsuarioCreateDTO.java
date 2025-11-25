@@ -8,10 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO para crear un nuevo usuario
- * Contiene solo los campos necesarios para la creación
- */
+
 @Data
 @Builder
 @NoArgsConstructor

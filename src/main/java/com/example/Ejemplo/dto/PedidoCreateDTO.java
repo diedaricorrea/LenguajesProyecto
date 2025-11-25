@@ -7,10 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 
-/**
- * DTO para crear nuevos pedidos
- * Solo contiene la información necesaria para la creación
- */
 @Data
 @Builder
 @NoArgsConstructor

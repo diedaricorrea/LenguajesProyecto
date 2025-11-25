@@ -10,10 +10,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-/**
- * DTO para visualizar pedidos en el sistema
- * Incluye información del usuario y detalles de productos
- */
+
 @Data
 @Builder
 @NoArgsConstructor

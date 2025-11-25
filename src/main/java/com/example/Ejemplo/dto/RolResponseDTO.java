@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
-/**
- * DTO completo de respuesta para Rol
- */
+
 @Data
 @Builder
 @NoArgsConstructor

@@ -34,13 +34,13 @@ public class MenuDiaController {
 
     @GetMapping("/")
     public String menuDia(Model model, @AuthenticationPrincipal UsuarioDetails userDetails) {
-        // Obtener TODOS los productos activos directamente del repositorio
+
         List<Producto> menusEconomicos = productoRepository.findAll();
         
-        // Obtener menús programados (ordenados por fecha descendente)
+
         List<MenuDia> menusProgramados = menuDiaServiceImpl.findAllOrderByFechaDesc();
         
-        // Obtener menús de HOY
+
         List<MenuDia> menusHoy = menuDiaServiceImpl.findMenusDelDia(LocalDate.now());
         
         model.addAttribute("menusEconomicos", menusEconomicos);

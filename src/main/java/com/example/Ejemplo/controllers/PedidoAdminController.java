@@ -19,16 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Controlador para la gestión administrativa de pedidos
- * Gestiona los pedidos desde el punto de vista de la cafetería
- * 
- * Rutas principales:
- * - GET /admin/pedidos - Lista todos los pedidos
- * - POST /admin/pedidos/buscar - Busca por código
- * - POST /admin/pedidos/{id}/avanzar - Avanza al siguiente estado
- * - POST /admin/pedidos/{id}/cancelar - Cancela un pedido
- */
+
 @Controller
 @RequestMapping("/admin/pedidos")
 @PreAuthorize("hasAnyAuthority('PEDIDOS_VER', 'PEDIDOS_GESTIONAR', 'ROLE_ADMINISTRADOR')")
@@ -41,11 +32,7 @@ public class PedidoAdminController {
         this.pedidosService = pedidosService;
     }
     
-    /**
-     * Lista todos los pedidos agrupados por estado
-     * Soporta filtro por rango de fechas
-     * GET /admin/pedidos
-     */
+
     @GetMapping
     public String listarPedidos(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
@@ -135,10 +122,7 @@ public class PedidoAdminController {
         }
     }
     
-    /**
-     * Busca pedidos por código
-     * POST /admin/pedidos/buscar
-     */
+
     @PostMapping("/buscar")
     public String buscarPedido(
             @RequestParam("codigo") String codigo,
@@ -169,31 +153,24 @@ public class PedidoAdminController {
         }
     }
     
-    /**
-     * Avanza un pedido al siguiente estado del flujo
-     * POST /admin/pedidos/{id}/avanzar
-     */
+
     @PostMapping("/{id}/avanzar")
     public String avanzarEstado(
             @PathVariable Integer id,
             @RequestParam(required = false) String fromTab,
             RedirectAttributes redirectAttributes) {
         try {
-            // Obtener el usuario del pedido para notificarle
             Pedido pedido = pedidosService.buscarPorId(id)
                     .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
             
             Integer idUsuario = pedido.getUsuario() != null ? pedido.getUsuario().getIdUsuario() : null;
             
-            // Delegar la lógica al service
             if (!pedidosService.avanzarEstadoPedido(id, idUsuario)) {
                 redirectAttributes.addFlashAttribute("mensaje", 
                     "No se puede avanzar el estado del pedido");
                 redirectAttributes.addFlashAttribute("tipoMensaje", "warning");
             }
-            // No mostramos mensaje de éxito para no duplicar con la confirmación
             
-            // Recordar el tab desde donde se hizo la acción
             if (fromTab != null) {
                 redirectAttributes.addFlashAttribute("activeTab", fromTab);
             }
@@ -208,10 +185,6 @@ public class PedidoAdminController {
         return "redirect:/admin/pedidos";
     }
     
-    /**
-     * Cancela un pedido
-     * POST /admin/pedidos/{id}/cancelar
-     */
     @PostMapping("/{id}/cancelar")
     public String cancelarPedido(
             @PathVariable Integer id,
@@ -219,13 +192,11 @@ public class PedidoAdminController {
             @RequestParam(required = false) String fromTab,
             RedirectAttributes redirectAttributes) {
         try {
-            // Obtener el usuario del pedido para notificarle
             Pedido pedido = pedidosService.buscarPorId(id)
                     .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
             
             Integer idUsuario = pedido.getUsuario() != null ? pedido.getUsuario().getIdUsuario() : null;
             
-            // Delegar la lógica al service
             if (pedidosService.cancelarPedido(id, motivo, idUsuario)) {
                 redirectAttributes.addFlashAttribute("mensaje", 
                     "Pedido cancelado exitosamente");
@@ -236,7 +207,6 @@ public class PedidoAdminController {
                 redirectAttributes.addFlashAttribute("tipoMensaje", "warning");
             }
             
-            // Recordar el tab desde donde se hizo la acción
             if (fromTab != null) {
                 redirectAttributes.addFlashAttribute("activeTab", fromTab);
             }

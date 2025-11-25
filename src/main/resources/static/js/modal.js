@@ -22,25 +22,57 @@ modalDetalle.addEventListener('show.bs.modal', function (event) {
 
 
 function abrirModal(button) {
-    const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
-    document.getElementById('modalNombre').innerText = button.dataset.nombre;
-    document.getElementById('modalPrecio').innerText = 'S/ ' + button.dataset.precio;
-    document.getElementById('nombreProducto').value = button.dataset.nombre;
-    document.getElementById('modalDescription').innerText = button.dataset.description || 'Sin descripción disponible';
-    document.getElementById('idProducto').value = button.dataset.id;
-    document.getElementById('cantidadInput').value = 1;
+    const modalElement = document.getElementById('modalDetalle');
+    if (!modalElement) {
+        console.error('Modal no encontrado');
+        return;
+    }
+    
+    // Si se llama sin parámetro (desde carrito), solo abre el modal
+    if (!button) {
+        modalElement.style.display = 'block';
+        return;
+    }
+    
+    // Si se llama con parámetro (desde catálogo con datos del producto)
+    const modal = new bootstrap.Modal(modalElement);
+    if (document.getElementById('modalNombre')) {
+        document.getElementById('modalNombre').innerText = button.dataset.nombre;
+    }
+    if (document.getElementById('modalPrecio')) {
+        document.getElementById('modalPrecio').innerText = 'S/ ' + button.dataset.precio;
+    }
+    if (document.getElementById('nombreProducto')) {
+        document.getElementById('nombreProducto').value = button.dataset.nombre;
+    }
+    if (document.getElementById('modalDescription')) {
+        document.getElementById('modalDescription').innerText = button.dataset.description || 'Sin descripción disponible';
+    }
+    if (document.getElementById('idProducto')) {
+        document.getElementById('idProducto').value = button.dataset.id;
+    }
+    if (document.getElementById('cantidadInput')) {
+        document.getElementById('cantidadInput').value = 1;
+    }
     modal.show();
 }
 
 function cerrarModal() {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('modalDetalle'));
-    if (modal) {
-        modal.hide();
+    const modalElement = document.getElementById('modalDetalle');
+    if (!modalElement) return;
+    
+    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+    if (modalInstance) {
+        modalInstance.hide();
+    } else {
+        modalElement.style.display = 'none';
     }
 }
 
 function incrementarCantidad() {
     const input = document.getElementById('cantidadInput');
+    if (!input) return;
+    
     const max = parseInt(input.max);
     const current = parseInt(input.value);
     if (current < max) {
@@ -50,6 +82,8 @@ function incrementarCantidad() {
 
 function decrementarCantidad() {
     const input = document.getElementById('cantidadInput');
+    if (!input) return;
+    
     const min = parseInt(input.min);
     const current = parseInt(input.value);
     if (current > min) {
@@ -57,6 +91,8 @@ function decrementarCantidad() {
     }
 }
 
-function cerrarModal() {
-    document.getElementById('modalDetalle').style.display = 'none';
+function confirmarPago() {
+    // Esta función se puede usar para validaciones adicionales antes del submit
+    console.log('Confirmando pago...');
+    return true;
 }

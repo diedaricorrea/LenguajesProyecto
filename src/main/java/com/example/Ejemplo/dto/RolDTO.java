@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO base para Rol
- */
+
 @Data
 @Builder
 @NoArgsConstructor

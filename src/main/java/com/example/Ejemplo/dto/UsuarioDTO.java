@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO base para Usuario
- * Usado para mostrar información básica de usuario
- */
+
 @Data
 @Builder
 @NoArgsConstructor

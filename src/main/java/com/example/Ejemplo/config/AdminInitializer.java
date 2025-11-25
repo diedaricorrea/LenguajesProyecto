@@ -31,14 +31,14 @@ public class AdminInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String correoAdmin = "admin@cafeteria.com";
 
-        // Verifica si ya existe
+       
         Optional<Usuario> adminExistente = usuarioRepository.findByCorreo(correoAdmin);
         if (adminExistente.isEmpty()) {
             Usuario admin = new Usuario();
             admin.setNombre("Administrador");
             admin.setCorreo(correoAdmin);
-            admin.setPassword(passwordEncoder.encode("admin123")); // Puedes cambiarla luego
-            admin.setRol(Rol.ADMINISTRADOR); // Mantener para compatibilidad
+            admin.setPassword(passwordEncoder.encode("admin123")); 
+            admin.setRol(Rol.ADMINISTRADOR); 
             admin.setFechaIngreso(LocalDateTime.now());
             admin.setEstado(true);
             
@@ -49,7 +49,7 @@ public class AdminInitializer implements CommandLineRunner {
             usuarioRepository.save(admin);
             System.out.println("✅ Usuario ADMINISTRADOR creado con éxito.");
         } else {
-            // Actualizar usuarios existentes con el nuevo sistema de roles
+            
             Usuario admin = adminExistente.get();
             if (admin.getRolEntity() == null && admin.getRol() != null) {
                 Optional<RolEntity> rolEntity = rolEntityRepository.findByNombre(admin.getRol().name());

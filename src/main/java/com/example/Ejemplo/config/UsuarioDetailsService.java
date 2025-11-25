@@ -22,10 +22,9 @@ public class UsuarioDetailsService implements UserDetailsService{
         
         Usuario usuario = null;
         
-        // Intentar buscar por correo primero
         usuario = usuarioRepository.findByCorreo(username).orElse(null);
         
-        // Si no se encuentra, intentar buscar por código estudiantil
+
         if (usuario == null) {
             log.debug("No encontrado por correo, intentando por código estudiantil...");
             usuario = usuarioRepository.findByCodigoEstudiantil(username).orElse(null);
