@@ -654,15 +654,16 @@
         const showRegisterModal = /*[[${showRegisterModal}]]*/ false;
         const isAuthenticated = /*[[${#authorization.expression('isAuthenticated()')}]]*/ false;
         
-        // Mostrar mensajes
+        // Mostrar mensajes de éxito
         if (message) {
             Swal.fire({
                 icon: 'success',
-                title: 'Éxito',
+                title: '¡Éxito!',
                 text: message,
-                confirmButtonColor: '#0d6efd',
+                confirmButtonColor: '#c26b1d',
                 timer: 3000,
-                timerProgressBar: true
+                timerProgressBar: true,
+                showConfirmButton: false
             });
         }
         
@@ -671,18 +672,24 @@
                 icon: 'success',
                 title: '¡Genial!',
                 text: success,
-                confirmButtonColor: '#0d6efd',
-                timer: 4000,
-                timerProgressBar: true
+                confirmButtonColor: '#c26b1d',
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false
             });
         }
         
+        // Mostrar mensajes de error
         if (error) {
             Swal.fire({
                 icon: 'error',
-                title: 'Oops...',
+                title: 'Stock insuficiente',
                 text: error,
-                confirmButtonColor: '#dc3545'
+                confirmButtonColor: '#c26b1d',
+                confirmButtonText: 'Entendido',
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                }
             });
         }
         

@@ -148,12 +148,19 @@ public class ProductoController {
         }).orElse(null);
 
         if (producto == null) {
-            redirectAttributes.addFlashAttribute("message", "Producto no encontrado.");
+            redirectAttributes.addFlashAttribute("error", "Producto no encontrado.");
             return "redirect:/catalogo";
         }
 
+        // Validar que haya stock disponible
+        if (producto.getStock() <= 0) {
+            redirectAttributes.addFlashAttribute("error", "Lo sentimos, este producto no tiene stock disponible.");
+            return "redirect:/catalogo";
+        }
+
+        // Validar que la cantidad solicitada no exceda el stock disponible
         if (cantidad > producto.getStock()) {
-            redirectAttributes.addFlashAttribute("message", "El stock no puede ser menor que el stock.");
+            redirectAttributes.addFlashAttribute("error", "No hay suficiente stock. Solo hay " + producto.getStock() + " unidades disponibles.");
             return "redirect:/catalogo";
         }
 
@@ -162,17 +169,24 @@ public class ProductoController {
         for (Carrito carro : carrito) {
             if (carro.getIdProducto().getIdProducto() == idProducto) {
                 nuevaCantidad = carro.getCantidad() + cantidad;
+                
+                // Validar que la nueva cantidad total no exceda el stock
+                if (nuevaCantidad > producto.getStock()) {
+                    redirectAttributes.addFlashAttribute("error", "No hay suficiente stock. Ya tienes " + carro.getCantidad() + " en el carrito. Stock disponible: " + producto.getStock());
+                    return "redirect:/catalogo";
+                }
+                
                 nuevoTotal = nuevaCantidad * carro.getIdProducto().getPrecio();
                 if (carritoServiceImpl.actualizarProductoAgregado(idUsuario, idProducto, nuevaCantidad,
                         nuevoTotal) > 0) {
-                    redirectAttributes.addFlashAttribute("message", "Se añadió al carrito correctamente");
+                    redirectAttributes.addFlashAttribute("success", "Se añadió al carrito correctamente");
                     return "redirect:/catalogo";
                 }
             }
         }
 
         carritoServiceImpl.saveCarrito(idUsuario, idProducto, cantidad, total);
-        redirectAttributes.addFlashAttribute("message", "Se añadió al carrito correctamente");
+        redirectAttributes.addFlashAttribute("success", "Se añadió al carrito correctamente");
         return "redirect:/catalogo";
     }
 
