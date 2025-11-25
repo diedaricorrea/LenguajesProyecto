@@ -422,17 +422,21 @@
             </div>
             
             <div class="filter-container d-flex justify-content-center gap-3 flex-wrap mb-3">
+                <a class="filter-chip filtro-general" th:href="@{/catalogo(categoria='Sandwich')}"
+                   th:classappend="${param.categoria} == 'Sandwich' ? ' active' : ''">
+                    <i class="bi bi-egg-fried me-2"></i>Sandwich
+                </a>
+                <a class="filter-chip filtro-general" th:href="@{/catalogo(categoria='Antojitos')}"
+                   th:classappend="${param.categoria} == 'Antojitos' ? ' active' : ''">
+                    <i class="bi bi-bag-fill me-2"></i>Antojitos
+                </a>
                 <a class="filter-chip filtro-general" th:href="@{/catalogo(categoria='Bebidas')}"
                    th:classappend="${param.categoria} == 'Bebidas' ? ' active' : ''">
                     <i class="bi bi-cup-straw me-2"></i>Bebidas
                 </a>
-                <a class="filter-chip filtro-general" th:href="@{/catalogo(categoria='Snack')}"
-                   th:classappend="${param.categoria} == 'Snack' ? ' active' : ''">
-                    <i class="bi bi-bag-fill me-2"></i>Snacks
-                </a>
-                <a class="filter-chip filtro-general" th:href="@{/catalogo(categoria='Postres')}"
-                   th:classappend="${param.categoria} == 'Postres' ? ' active' : ''">
-                    <i class="bi bi-cake2 me-2"></i>Postres
+                <a class="filter-chip filtro-general" th:href="@{/catalogo(categoria='Endulzate')}"
+                   th:classappend="${param.categoria} == 'Endulzate' ? ' active' : ''">
+                    <i class="bi bi-cake2 me-2"></i>Endúlzate
                 </a>
                 <a href="#" id="btn-menu-dia" class="filter-chip">
                     <i class="bi bi-calendar-day me-2"></i>Menú del Día

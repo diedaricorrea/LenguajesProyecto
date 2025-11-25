@@ -84,7 +84,7 @@ public class ProductoController {
             model.addAttribute("usuarioRegistro", new UsuarioRegistroDTO());
         }
 
-        int pageSize = 6;
+        int pageSize = 8;
         Pageable pageable = PageRequest.of(page, pageSize);
         Page<Producto> productosPage;
 
@@ -134,6 +134,7 @@ public class ProductoController {
             @AuthenticationPrincipal UsuarioDetails userDetails,
             @RequestParam int cantidad,
             RedirectAttributes redirectAttributes) {
+
         Usuario usuario = userDetails.getUsuario();
         int idUsuario = usuario.getIdUsuario();
         int nuevaCantidad = 0;
