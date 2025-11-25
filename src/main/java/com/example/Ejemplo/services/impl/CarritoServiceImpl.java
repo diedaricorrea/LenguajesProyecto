@@ -5,6 +5,9 @@ import com.example.Ejemplo.models.Producto;
 import com.example.Ejemplo.repository.CarritoRepository;
 import com.example.Ejemplo.repository.ProductoRepository;
 import com.example.Ejemplo.services.CarritoService;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +20,6 @@ public class CarritoServiceImpl implements CarritoService {
     private final CarritoRepository carritoRepository;
     private final ProductoRepository productoRepository;
 
-    @Autowired
     public CarritoServiceImpl(CarritoRepository carritoRepository, ProductoRepository productoRepository) {
         this.carritoRepository = carritoRepository;
         this.productoRepository = productoRepository;

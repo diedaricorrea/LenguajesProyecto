@@ -40,52 +40,43 @@ public class RolesPermisosInitializer implements CommandLineRunner {
 
     private void crearPermisosSiNoExisten() {
         List<Permiso> permisos = Arrays.asList(
-            // PRODUCTOS
             new Permiso("PRODUCTOS_VER", "Ver catálogo de productos", "PRODUCTOS"),
             new Permiso("PRODUCTOS_CREAR", "Crear nuevos productos", "PRODUCTOS"),
             new Permiso("PRODUCTOS_EDITAR", "Editar productos existentes", "PRODUCTOS"),
             new Permiso("PRODUCTOS_ELIMINAR", "Eliminar productos", "PRODUCTOS"),
             new Permiso("PRODUCTOS_GESTIONAR", "Gestión completa de productos", "PRODUCTOS"),
             
-            // CATEGORÍAS
             new Permiso("CATEGORIAS_VER", "Ver categorías", "CATEGORIAS"),
             new Permiso("CATEGORIAS_CREAR", "Crear nuevas categorías", "CATEGORIAS"),
             new Permiso("CATEGORIAS_EDITAR", "Editar categorías", "CATEGORIAS"),
             new Permiso("CATEGORIAS_ELIMINAR", "Eliminar categorías", "CATEGORIAS"),
-            
-            // PEDIDOS
+
             new Permiso("PEDIDOS_VER", "Ver pedidos", "PEDIDOS"),
             new Permiso("PEDIDOS_CREAR", "Crear pedidos", "PEDIDOS"),
             new Permiso("PEDIDOS_GESTIONAR", "Gestionar todos los pedidos", "PEDIDOS"),
             new Permiso("PEDIDOS_ACTUALIZAR_ESTADO", "Actualizar estado de pedidos", "PEDIDOS"),
-            
-            // USUARIOS
+
             new Permiso("USUARIOS_VER", "Ver lista de usuarios", "USUARIOS"),
             new Permiso("USUARIOS_CREAR", "Crear nuevos usuarios", "USUARIOS"),
             new Permiso("USUARIOS_EDITAR", "Editar usuarios", "USUARIOS"),
             new Permiso("USUARIOS_ELIMINAR", "Eliminar usuarios", "USUARIOS"),
             new Permiso("USUARIOS_GESTIONAR_ROLES", "Asignar roles a usuarios", "USUARIOS"),
-            
-            // VENTAS
+
             new Permiso("VENTAS_VER", "Ver registro de ventas", "VENTAS"),
             new Permiso("VENTAS_CREAR", "Registrar ventas", "VENTAS"),
             new Permiso("VENTAS_GESTIONAR", "Gestión completa de ventas", "VENTAS"),
-            
-            // ESTADÍSTICAS
+
             new Permiso("ESTADISTICAS_VER", "Ver estadísticas del sistema", "ESTADISTICAS"),
             new Permiso("ESTADISTICAS_PRODUCTOS", "Ver estadísticas de productos", "ESTADISTICAS"),
             new Permiso("ESTADISTICAS_VENTAS", "Ver estadísticas de ventas", "ESTADISTICAS"),
             
-            // NOTIFICACIONES
             new Permiso("NOTIFICACIONES_VER", "Ver notificaciones", "NOTIFICACIONES"),
             new Permiso("NOTIFICACIONES_CREAR", "Crear notificaciones", "NOTIFICACIONES"),
             new Permiso("NOTIFICACIONES_GESTIONAR", "Gestionar notificaciones", "NOTIFICACIONES"),
             
-            // MENÚ DEL DÍA
             new Permiso("MENU_DIA_VER", "Ver menú del día", "MENU_DIA"),
             new Permiso("MENU_DIA_GESTIONAR", "Gestionar menú del día", "MENU_DIA"),
             
-            // CARRITO
             new Permiso("CARRITO_GESTIONAR", "Gestionar carrito de compras", "CARRITO")
         );
 
@@ -98,11 +89,9 @@ public class RolesPermisosInitializer implements CommandLineRunner {
     }
 
     private void crearRolesSiNoExisten() {
-        // ROL ADMINISTRADOR - Acceso total
         if (!rolEntityRepository.existsByNombre("ADMINISTRADOR")) {
             RolEntity admin = new RolEntity("ADMINISTRADOR", "Administrador del sistema con acceso total");
             
-            // El administrador tiene TODOS los permisos
             List<Permiso> todosPermisos = permisoRepository.findAll();
             todosPermisos.forEach(admin::agregarPermiso);
             
@@ -110,7 +99,6 @@ public class RolesPermisosInitializer implements CommandLineRunner {
             log.info("Rol ADMINISTRADOR creado con {} permisos", todosPermisos.size());
         }
 
-        // ROL TRABAJADOR - Gestión operativa
         if (!rolEntityRepository.existsByNombre("TRABAJADOR")) {
             RolEntity trabajador = new RolEntity("TRABAJADOR", "Trabajador con permisos operativos");
             

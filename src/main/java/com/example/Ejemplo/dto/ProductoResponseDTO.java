@@ -20,10 +20,8 @@ public class ProductoResponseDTO {
     private Boolean estado;
     private String imagenUrl;
     
-    // Categoría completa como DTO anidado
     private CategoriaDTO categoria;
     
-    // Información adicional calculada
-    private Boolean disponible; // stock > 0 && estado == true
-    private String estadoTexto; // "Disponible", "Sin stock", "No disponible"
+    private Boolean disponible;
+    private String estadoTexto;
 }
