@@ -158,17 +158,14 @@ public class RolEntityServiceImpl implements RolEntityService {
         RolEntity rol = rolRepository.findByIdWithPermisos(asignarDTO.getIdRol())
                 .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado"));
         
-        // Obtener permisos
         List<Permiso> permisos = permisoRepository.findAllById(asignarDTO.getIdsPermisos());
         
         if (permisos.size() != asignarDTO.getIdsPermisos().size()) {
             throw new IllegalArgumentException("Algunos permisos no fueron encontrados");
         }
         
-        // Limpiar permisos anteriores
         rol.getPermisos().clear();
-        
-        // Asignar nuevos permisos
+
         permisos.forEach(rol::agregarPermiso);
         
         RolEntity actualizado = rolRepository.save(rol);

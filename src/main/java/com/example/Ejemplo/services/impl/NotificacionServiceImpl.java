@@ -49,7 +49,7 @@ public class NotificacionServiceImpl implements NotificacionService {
     @Transactional
     public void deleteNotificacion(int idNotificacion, int idUsuario) {
         log.info("Intentando eliminar notificación ID: {} para usuario ID: {}", idNotificacion, idUsuario);
-        // Verificar que la notificación pertenece al usuario antes de eliminar
+        
         notificacionRepository.findById(idNotificacion)
                 .filter(notif -> notif.getUsuario().getIdUsuario() == idUsuario)
                 .ifPresentOrElse(
@@ -74,7 +74,6 @@ public class NotificacionServiceImpl implements NotificacionService {
     @Override
     public List<Notificacion> getRecentNotificaciones(int idUsuario, int limit) {
         List<Notificacion> todasLasNotificaciones = notificacionRepository.findTopByUsuarioOrderByIdDesc(idUsuario);
-        // Limitar a las últimas N notificaciones
         return todasLasNotificaciones.stream()
                 .limit(limit)
                 .toList();

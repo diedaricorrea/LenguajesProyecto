@@ -32,7 +32,7 @@ public class ProductoServiceImpl implements ProductoService {
     private final ProductoMapper productoMapper;
     private final ImgBBUploader imgBBUploader;
 
-    // ============= CONSULTAS =============
+    // ============= CONSULTAS :v =============
 
     @Override
     public List<ProductoDTO> obtenerTodos() {
@@ -88,7 +88,7 @@ public class ProductoServiceImpl implements ProductoService {
                 .collect(Collectors.toList());
     }
 
-    // ============= PAGINACIÓN =============
+    // ============= PAGINACIÓN  LO QUE VES ABAJO ESTIMADOS=============
 
     @Override
     public Page<ProductoDTO> obtenerTodosPaginado(Pageable pageable) {
@@ -121,23 +121,17 @@ public class ProductoServiceImpl implements ProductoService {
         }
     }
 
-    // ============= CRUD OPERATIONS =============
-
     @Override
     @Transactional
     public ProductoDTO crear(ProductoCreateDTO createDTO, MultipartFile imagen) {
         log.info("Creando nuevo producto: {}", createDTO.getNombre());
         
-        // Validar datos
         validateProductoData(createDTO);
         
-        // Obtener o crear la categoría
         Categoria categoria = obtenerOCrearCategoria(createDTO);
         
-        // Convertir DTO a Entity
         Producto producto = productoMapper.toEntityWithCategoria(createDTO, categoria);
-        
-        // Subir imagen si existe
+
         if (imagen != null && !imagen.isEmpty()) {
             try {
                 String imageUrl = imgBBUploader.subirImagen(imagen);
@@ -165,10 +159,8 @@ public class ProductoServiceImpl implements ProductoService {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con ID: " + id));
         
-        // Validar datos
         validateProductoData(updateDTO);
         
-        // Actualizar categoría si cambió
         if (updateDTO.getIdCategoria() != null && 
             !updateDTO.getIdCategoria().equals(producto.getCategoria().getIdCategoria())) {
             Categoria nuevaCategoria = categoriaRepository.findById(updateDTO.getIdCategoria())
@@ -176,10 +168,8 @@ public class ProductoServiceImpl implements ProductoService {
             producto.setCategoria(nuevaCategoria);
         }
         
-        // Actualizar campos
         productoMapper.updateEntity(producto, updateDTO);
         
-        // Actualizar imagen si se proporciona una nueva
         if (imagen != null && !imagen.isEmpty()) {
             try {
                 String imageUrl = imgBBUploader.subirImagen(imagen);
@@ -303,7 +293,7 @@ public class ProductoServiceImpl implements ProductoService {
         return !productoRepository.findByNombreContaining(nombre).isEmpty();
     }
 
-    // ============= MÉTODOS PRIVADOS AUXILIARES =============
+    // ============= MeTODOS PRIVADOS AUXILIARES =============
 
     private void validateProductoData(ProductoCreateDTO dto) {
         if (dto.getNombre() == null || dto.getNombre().trim().isEmpty()) {
@@ -321,11 +311,9 @@ public class ProductoServiceImpl implements ProductoService {
         Categoria categoria;
         
         if (dto.getIdCategoria() != null) {
-            // Buscar por ID
             categoria = categoriaRepository.findById(dto.getIdCategoria())
                     .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada con ID: " + dto.getIdCategoria()));
         } else if (dto.getNombreCategoria() != null && !dto.getNombreCategoria().trim().isEmpty()) {
-            // Buscar por nombre o crear nueva
             categoria = categoriaRepository.findByNombre(dto.getNombreCategoria().trim());
             if (categoria == null) {
                 categoria = Categoria.builder()

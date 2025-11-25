@@ -18,10 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Implementación del servicio de usuarios
- * Usa DTOs y aplica validaciones de negocio
- */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -73,18 +69,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioResponseDTO crearUsuario(UsuarioCreateDTO usuarioDTO) {
         logger.info("Creando nuevo usuario: {}", usuarioDTO.getCorreo());
         
-        // Validar que el correo no exista
         if (usuarioRepository.existsByCorreo(usuarioDTO.getCorreo())) {
             throw new IllegalArgumentException("Ya existe un usuario con el correo: " + usuarioDTO.getCorreo());
         }
         
-        // Convertir DTO a entidad
         Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
         
-        // Encriptar contraseña
         usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
         
-        // Guardar
         Usuario guardado = usuarioRepository.save(usuario);
         
         logger.info("Usuario creado exitosamente con ID: {}", guardado.getIdUsuario());
@@ -99,10 +91,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = usuarioRepository.findById(usuarioDTO.getIdUsuario())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + usuarioDTO.getIdUsuario()));
         
-        // Actualizar campos
         usuarioMapper.updateEntity(usuario, usuarioDTO);
         
-        // Guardar cambios
         Usuario actualizado = usuarioRepository.save(usuario);
         
         logger.info("Usuario actualizado exitosamente: {}", actualizado.getIdUsuario());
@@ -160,26 +150,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioResponseDTO registrarUsuario(UsuarioRegistroDTO registroDTO) {
         logger.info("Registrando nuevo estudiante: {} ({})", registroDTO.getNombre(), registroDTO.getCodigoEstudiantil());
         
-        // Validar que el código estudiantil no exista
         if (usuarioRepository.existsByCodigoEstudiantil(registroDTO.getCodigoEstudiantil())) {
             throw new IllegalArgumentException("Ya existe una cuenta con ese código estudiantil");
         }
         
-        // El correo se genera automáticamente: codigoEstudiantil@utp.edu.pe
-        // No necesita validación adicional porque el código ya es único
-        
-        // Validar que las contraseñas coincidan
         if (!registroDTO.getPassword().equals(registroDTO.getConfirmarPassword())) {
             throw new IllegalArgumentException("Las contraseñas no coinciden");
         }
-        
-        // Convertir DTO a entidad
+
         Usuario usuario = usuarioMapper.toEntityFromRegistro(registroDTO);
-        
-        // Encriptar contraseña
+
         usuario.setPassword(passwordEncoder.encode(registroDTO.getPassword()));
-        
-        // Guardar
+
         Usuario guardado = usuarioRepository.save(usuario);
         
         logger.info("Estudiante registrado exitosamente - ID: {}, Código: {}", 
@@ -220,21 +202,14 @@ public class UsuarioServiceImpl implements UsuarioService {
         return stats;
     }
     
-    // ============================================================
     // Métodos legacy para compatibilidad (deprecados)
-    // ============================================================
     
-    /**
-     * @deprecated Usar findUsuarioById que retorna DTO
-     */
+
     @Deprecated
     public Usuario findUsuarioEntityById(Integer id) {
         return usuarioRepository.findById(id).orElse(null);
     }
     
-    /**
-     * @deprecated Usar crearUsuario o actualizarUsuario
-     */
     @Deprecated
     @Transactional
     public Usuario saveUser(Usuario usuario) {
@@ -242,9 +217,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepository.save(usuario);
     }
     
-    /**
-     * @deprecated Usar buscarUsuarios
-     */
     @Deprecated
     public Usuario findUsuarioPorCorreo(String correo) {
         return usuarioRepository.findByCorreo(correo).orElse(null);

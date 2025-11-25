@@ -37,7 +37,7 @@ public class PedidosServiceImpl implements PedidosService {
         this.notificacionService = notificacionService;
     }
 
-    // ==================== Métodos CRUD básicos ====================
+    // ==================== ESTOS SON LOS MEtodos CRUD básicos ====================
     
     @Override
     @Transactional
@@ -53,7 +53,7 @@ public class PedidosServiceImpl implements PedidosService {
         return pedidosRepository.deleteByCodigoPedido(codigoPedido);
     }
     
-    // ==================== Métodos de consulta ====================
+    // ==================== MIRA ESTOS SON LOS Métodos de consulta ====================
 
     @Override
     public List<Pedido> obtenerTodosPedidos() {
@@ -80,7 +80,7 @@ public class PedidosServiceImpl implements PedidosService {
         return pedidosRepository.findByCodigoPedido(codigoPedido);
     }
     
-    // ==================== Métodos de agrupación y conversión ====================
+    // ==================== Métodos de agrupación y conversion XD ====================
     
     @Override
     public Map<EstadoPedido, List<PedidoDTO>> agruparPedidosPorEstado() {

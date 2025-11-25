@@ -11,12 +11,9 @@ public interface NotificacionService {
     
     List<Notificacion> findAllByUsuario_IdUsuario(int idUsuario);
     
-    // Eliminar una notificación específica
     void deleteNotificacion(int idNotificacion, int idUsuario);
     
-    // Eliminar todas las notificaciones de un usuario
     void deleteAllNotificaciones(int idUsuario);
-    
-    // Obtener las últimas N notificaciones
+
     List<Notificacion> getRecentNotificaciones(int idUsuario, int limit);
 }

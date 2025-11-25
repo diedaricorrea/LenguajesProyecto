@@ -40,7 +40,7 @@ public class CategoriaServiceImpl implements CategoriaService {
         
         return categorias.stream()
                 .map(categoria -> {
-                    // Usar consulta optimizada para contar productos
+
                     long cantidadProductos = categoriaRepository.countProductosByCategoria(categoria.getIdCategoria());
                     
                     return CategoriaResponseDTO.builder()
@@ -80,12 +80,10 @@ public class CategoriaServiceImpl implements CategoriaService {
     public CategoriaDTO crear(CategoriaCreateDTO createDTO) {
         log.info("Creando nueva categoría: {}", createDTO.getNombre());
         
-        // Validar que el nombre no esté vacío
         if (createDTO.getNombre() == null || createDTO.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre de la categoría no puede estar vacío");
         }
-        
-        // Validar que no exista otra categoría con el mismo nombre
+
         if (existePorNombre(createDTO.getNombre().trim())) {
             throw new IllegalArgumentException("Ya existe una categoría con el nombre: " + createDTO.getNombre());
         }
@@ -105,7 +103,6 @@ public class CategoriaServiceImpl implements CategoriaService {
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada con ID: " + id));
         
-        // Validar que no exista otra categoría con el mismo nombre (excepto la actual)
         Categoria existente = categoriaRepository.findByNombre(updateDTO.getNombre().trim());
         if (existente != null && !existente.getIdCategoria().equals(id)) {
             throw new IllegalArgumentException("Ya existe una categoría con el nombre: " + updateDTO.getNombre());
@@ -123,12 +120,10 @@ public class CategoriaServiceImpl implements CategoriaService {
     public void eliminarPorId(Integer id) {
         log.info("Intentando eliminar categoría ID: {}", id);
         
-        // Verificar que la categoría existe
         if (!categoriaRepository.existsById(id)) {
             throw new IllegalArgumentException("Categoría no encontrada con ID: " + id);
         }
         
-        // Verificar si la categoría tiene productos asociados
         long cantidadProductos = contarProductosPorCategoria(id);
         if (cantidadProductos > 0) {
             throw new IllegalStateException(
@@ -147,7 +142,6 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     public long contarProductosPorCategoria(Integer idCategoria) {
-        // Usar el método optimizado del repositorio que no carga la colección
         return categoriaRepository.countProductosByCategoria(idCategoria);
     }
 
