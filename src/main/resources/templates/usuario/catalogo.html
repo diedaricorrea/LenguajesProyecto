@@ -542,21 +542,63 @@
 
 
 
-        <!-- Modal -->
-        <div id="modalDetalle" class="modal">
-            <div class="modal-contenido">
-                <span class="cerrar" onclick="cerrarModal()">&times;</span>
-                <h2 id="modalNombre"></h2>
-                <p id="modalPrecio"></p>
-                <p id="modalDescription"></p>
-                <form method="post" th:action="@{/catalogo/subir}" id="formAgregarCarrito">
-                    <input type="hidden" id="idProducto" name="idProducto">
-                    <input type="hidden" name="idUsuario" value="1" id="idUsuario">
-                    <input type="hidden" name="nombreProducto" id="nombreProducto">
-                    <label>Cantidad:</label>
-                    <input type="number" name="cantidad" min="1" max="10" value="1" required>
-                    <button type="submit">Agregar al carrito</button>
-                </form>
+        <!-- Modal Bootstrap -->
+        <div class="modal fade" id="modalDetalle" tabindex="-1" aria-labelledby="modalDetalleLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <!-- Header con gradiente -->
+                    <div class="modal-header border-0 text-white position-relative" style="background: linear-gradient(135deg, #c26b1d 0%, #8f542c 100%); padding: 1.5rem;">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-cart-plus fs-2"></i>
+                            <div>
+                                <h5 class="modal-title fw-bold mb-1" id="modalNombre"></h5>
+                                <p class="mb-0 fs-5 fw-semibold" id="modalPrecio"></p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    
+                    <!-- Body -->
+                    <div class="modal-body p-4">
+                        <!-- Descripción -->
+                        <div class="mb-4">
+                            <label class="form-label text-uppercase fw-semibold text-muted small mb-2">
+                                <i class="bi bi-file-text me-1"></i>Descripción
+                            </label>
+                            <p class="text-secondary" id="modalDescription"></p>
+                        </div>
+                        
+                        <!-- Formulario -->
+                        <form method="post" th:action="@{/catalogo/subir}" id="formAgregarCarrito">
+                            <input type="hidden" id="idProducto" name="idProducto">
+                            <input type="hidden" name="idUsuario" value="1" id="idUsuario">
+                            <input type="hidden" name="nombreProducto" id="nombreProducto">
+                            
+                            <!-- Control de cantidad -->
+                            <div class="mb-4">
+                                <label class="form-label text-uppercase fw-semibold text-muted small mb-2">
+                                    <i class="bi bi-hash me-1"></i>Cantidad
+                                </label>
+                                <div class="input-group" style="width: fit-content;">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="decrementarCantidad()">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+                                    <input type="number" id="cantidadInput" name="cantidad" min="1" max="10" value="1" 
+                                           required class="form-control text-center fw-bold" style="width: 80px;">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="incrementarCantidad()">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Botón agregar -->
+                            <button type="submit" class="btn btn-lg w-100 text-white fw-semibold" 
+                                    style="background: #c26b1d; border: none;">
+                                <i class="bi bi-cart-plus me-2"></i>Agregar al Carrito
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
