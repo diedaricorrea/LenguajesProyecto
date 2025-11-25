@@ -31,11 +31,11 @@ public class UsuarioDetailsService implements UserDetailsService{
         }
         
         if (usuario == null) {
-            log.warn("❌ Usuario no encontrado: {}", username);
+            log.warn("Usuario no encontrado: {}", username);
             throw new UsernameNotFoundException("Usuario no encontrado: " + username);
         }
         
-        log.info("✅ Usuario encontrado: {} - Rol: {}", usuario.getCorreo(), usuario.getRolNombre());
+        log.info("Usuario encontrado: {} - Rol: {}", usuario.getCorreo(), usuario.getRolNombre());
         return new UsuarioDetails(usuario);
     }
 }

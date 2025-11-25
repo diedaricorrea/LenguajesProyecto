@@ -14,10 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Inicializador de roles y permisos del sistema
- * Se ejecuta al iniciar la aplicación para crear los datos base
- */
+
 @Component
 @Order(1)
 @RequiredArgsConstructor
@@ -137,7 +134,6 @@ public class RolesPermisosInitializer implements CommandLineRunner {
             log.info("Rol TRABAJADOR creado con {} permisos", trabajador.getPermisos().size());
         }
 
-        // ROL USUARIO - Permisos básicos
         if (!rolEntityRepository.existsByNombre("USUARIO")) {
             RolEntity usuario = new RolEntity("USUARIO", "Usuario regular del sistema");
             

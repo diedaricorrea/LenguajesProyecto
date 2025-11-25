@@ -35,7 +35,7 @@ public class UsuarioDetails implements UserDetails {
         if (usuario.getRolEntity() != null) {
             String roleName = "ROLE_" + usuario.getRolEntity().getNombre();
             authorities.add(new SimpleGrantedAuthority(roleName));
-            log.debug("🔑 Usuario '{}' tiene rol: {}", usuario.getCorreo(), roleName);
+            log.debug("Usuario '{}' tiene rol: {}", usuario.getCorreo(), roleName);
             
             
             if (usuario.getRolEntity().getPermisos() != null) {
@@ -44,21 +44,21 @@ public class UsuarioDetails implements UserDetails {
                         .collect(Collectors.toList());
                 
                 authorities.addAll(permisos);
-                log.info("✅ Usuario '{}' cargado con {} permisos: {}", 
+                log.info("Usuario '{}' cargado con {} permisos: {}", 
                         usuario.getCorreo(), 
                         permisos.size(),
                         permisos.stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(", ")));
             } else {
-                log.warn("⚠️ Usuario '{}' con rol '{}' pero SIN permisos asignados", 
+                log.warn("Usuario '{}' con rol '{}' pero SIN permisos asignados", 
                         usuario.getCorreo(), usuario.getRolEntity().getNombre());
             }
         } else if (usuario.getRol() != null) {
            
             String roleName = "ROLE_" + usuario.getRol().toString();
             authorities.add(new SimpleGrantedAuthority(roleName));
-            log.warn("🔄 Usuario '{}' usando rol ENUM (legacy): {}", usuario.getCorreo(), roleName);
+            log.warn("Usuario '{}' usando rol ENUM (legacy): {}", usuario.getCorreo(), roleName);
         } else {
-            log.error("❌ Usuario '{}' SIN ROL asignado!", usuario.getCorreo());
+            log.error("Usuario '{}' SIN ROL asignado!", usuario.getCorreo());
         }
         
         return authorities;
@@ -94,7 +94,7 @@ public class UsuarioDetails implements UserDetails {
        
         boolean activo = usuario.isEstado();
         if (!activo) {
-            log.warn("🚫 Usuario '{}' está INACTIVO - Login denegado", usuario.getCorreo());
+            log.warn("Usuario '{}' está INACTIVO - Login denegado", usuario.getCorreo());
         }
         return activo;
     }

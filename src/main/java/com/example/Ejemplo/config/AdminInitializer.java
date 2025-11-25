@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
-@Order(2) // Se ejecuta después de RolesPermisosInitializer
+@Order(2)
 public class AdminInitializer implements CommandLineRunner {
 
     @Autowired
@@ -42,12 +42,11 @@ public class AdminInitializer implements CommandLineRunner {
             admin.setFechaIngreso(LocalDateTime.now());
             admin.setEstado(true);
             
-            // Asignar el nuevo rol de entidad
             Optional<RolEntity> rolAdmin = rolEntityRepository.findByNombre("ADMINISTRADOR");
             rolAdmin.ifPresent(admin::setRolEntity);
 
             usuarioRepository.save(admin);
-            System.out.println("✅ Usuario ADMINISTRADOR creado con éxito.");
+            System.out.println("Usuario ADMINISTRADOR creado con éxito.");
         } else {
             
             Usuario admin = adminExistente.get();
@@ -56,10 +55,10 @@ public class AdminInitializer implements CommandLineRunner {
                 if (rolEntity.isPresent()) {
                     admin.setRolEntity(rolEntity.get());
                     usuarioRepository.save(admin);
-                    System.out.println("✅ Usuario ADMINISTRADOR actualizado con nuevo sistema de roles.");
+                    System.out.println("Usuario ADMINISTRADOR actualizado con nuevo sistema de roles.");
                 }
             } else {
-                System.out.println("ℹ️ Usuario ADMINISTRADOR ya existe.");
+                System.out.println("Usuario ADMINISTRADOR ya existe.");
             }
         }
     }
